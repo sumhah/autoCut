@@ -84,10 +84,12 @@ function start() {
 
     var cssText = '.root {\n    left: 0px;\n    top: 0px;\n    width: '  + parseFloat(app.activeDocument.width)  + 'px;\n    height: '  +  parseFloat(app.activeDocument.height)  + 'px;\n}\n\n';
 
+    var myLayerSets = [];
     try {
         each(uniqueLayers, function (item) {
             if (item.typename === 'LayerSet') {
                 item = item.merge();
+                myLayerSets.push(item);
             }
             cssText += getLayerCss(item) + '\n';
             item.visible = false;
@@ -98,7 +100,7 @@ function start() {
     }
 
     // 尝试修复图层有时候未隐藏的bug
-    each(uniqueLayers, function (item) {
+    each(myLayerSets, function (item) {
         item.visible = false;
     });
 
