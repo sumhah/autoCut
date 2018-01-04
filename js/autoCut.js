@@ -2,6 +2,7 @@
  * Created by zj-db0758 on 17/12/16.
  */
 require('./setting');
+require('colors');
 const File = require('./object/easyFile');
 const CssReader = require('./object/cssReader');
 const TagController = require('./object/tagController');
@@ -28,7 +29,8 @@ class AutoCut {
                     File.writeFile(`./dist/${PAGE_NAME}.vue`, tagController.vue);
                     File.writeFile(`./dist/css/${PAGE_NAME}.css`, tagController.css);
                     File.writeFile(`./dist/scss/${PAGE_NAME}.scss`, tagController.scss);
-                }, 'total');
+                    console.log('\nSuccess!'.green);
+        }, 'total'.rainbow);
             })
             .catch(e => console.error(e));
     }
