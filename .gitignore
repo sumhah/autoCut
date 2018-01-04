@@ -1,0 +1,9 @@
+.idea/autoCut.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/preferred-vcs.xml
+.idea/vcs.xml
+.idea/workspace.xml
+node_modules/
+dist/
+source/

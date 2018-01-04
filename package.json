@@ -1,0 +1,10 @@
+{
+  "name": "前端辅助工具",
+  "version": "0.0.1",
+  "devDependencies": {},
+  "dependencies": {
+    "css2json": "0.0.4",
+    "express": "^4.16.2",
+    "get-pixels": "^3.3.0"
+  }
+}

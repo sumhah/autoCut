@@ -1,0 +1,35 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <link href="./css/style.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript">window.module = undefined;</script>
+    <script type="text/javascript" src="./js/CSInterface.js"></script>
+    <script type="text/javascript" src="./js/Vulcan.js"></script>
+    <script type="text/javascript" src="./js/AgoraLib.js"></script>
+    <script type="text/javascript" src="./js/test.js"></script>
+</head>
+<body>
+<h1>AutoCut 1.0 beta version</h1>
+<h2>PSD => HTML,CSS</h2>
+<button class="tip" id="tip-btn" onclick="openTip()">展开帮助</button>
+<p id="tip" class="tip-text">对每个想要转换为html标签的图层重命名为 className$,<br>
+    以标识符$结尾，前面的名字为className,<br>
+    例如：<br>
+    图层1 重命名为:   top-item$ <br>
+    图层2 重命名为:   left-item$ <br>
+
+    命名完成后，点击Start按钮,
+    运行完毕后在同级目录下得到source文件夹，<br>
+    将source复制到AutoCut项目里执行node run命令 <br>
+    在dist文件夹里得到 *.html *.css *.vue *.scss文件
+</p>
+<input class="start-btn" type="button" value="Start" onclick="pop();">
+<script>
+    function openTip() {
+        document.getElementById('tip-btn').style.display = 'none';
+        document.getElementById('tip').style.display = 'block';
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+body {
+    background-color: #a2a1a3;
+}
+
+h1 {
+    font-size: 18px;
+    text-align: center;
+}
+h2 {
+    font-size: 14px;
+    text-align: center;
+}
+p {
+    font-size: 12px;
+}
+
+.tip {
+    border: none;
+    font-size: 16px;
+    color: #fff;
+    border-radius: .3em;
+    background-color: #bcbfc1;
+}
+
+.tip-text {
+    display: none;
+}
+
+.start-btn {
+    position: absolute;
+    left: 50%;
+    bottom: 10px;
+    transform: translateX(-50%);
+    display: block;
+    width: 140px;
+    margin: 0 auto;
+    border: none;
+    border-radius: .3em;
+    font-size: 30px;
+    text-align: center;
+    color: #fff;
+    background-color: #bcbfc1;
+}
