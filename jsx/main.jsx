@@ -58,7 +58,7 @@ function start() {
     }
 
     var selectedLayers = filter(allLayers, function (item, i) {
-        return /[\w_-]+\$$/.test(item.name);
+        return /[\w\W]+\$$/.test(item.name);
     }).sort(function (item1, item2) {
         var b1 = item1.bounds;
         var b2 = item2.bounds;
