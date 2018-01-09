@@ -21,36 +21,6 @@ function filter(arr, callback) {
     }
     return newArr;
 }
-Array.prototype.sort = function (fun) {
-    for (var i = 0; i < this.length - 1; i++) {
-        var flag = true;
-        for (var j = 0; j < this.length - i - 1; j++) {
-            if (typeof fun == 'function') {
-                if (fun(this[j], this[j + 1]) > 0) {
-                    //交换
-                    flag = false;
-                    var temp;
-                    temp = this[j];
-                    this[j] = this[j + 1];
-                    this[j + 1] = temp;
-                }
-            } else {
-                if (this[j] > this[j + 1]) {
-                    //交换
-                    flag = false;
-                    var temp;
-                    temp = this[j];
-                    this[j] = this[j + 1];
-                    this[j + 1] = temp;
-                }
-            }
-        }
-        if (flag) {
-            break;
-        }
-    }
-    return this;
-};
 
 function exportDirty(layer) {
     var doc = app.activeDocument;
@@ -68,12 +38,12 @@ function exportDirty(layer) {
     var h = b1[3] - b1[1];
     var temp;
 
-    layer.copy();
-    app.documents.add(w, h, 72, 'temp', NewDocumentMode.RGB, DocumentFill.TRANSPARENT, 1);
-    temp = app.activeDocument;
-    temp.paste();
-    temp.exportDocument(fileOut, ExportType.SAVEFORWEB, exportOptions);
-    temp.close(SaveOptions.DONOTSAVECHANGES);
+    // layer.copy();
+    // app.documents.add(w, h, 72, 'temp', NewDocumentMode.RGB, DocumentFill.TRANSPARENT, 1);
+    // temp = app.activeDocument;
+    // temp.paste();
+    doc.exportDocument(fileOut, ExportType.SAVEFORWEB, exportOptions);
+    // temp.close(SaveOptions.DONOTSAVECHANGES);
 }
 
 function exportLayer(layer) {
@@ -121,9 +91,29 @@ function exportLayer(layer) {
         saveLayer(layer, layer.name.substring(0, -1), outFolder, false);
     }
 
-    app.activeDocument.activeLayer = layer;
+    function onlyCurrentLayerVisible() {
+        var idShw = charIDToTypeID( "Shw " );
+        var desc38 = new ActionDescriptor();
+        var idnull = charIDToTypeID( "null" );
+        var list10 = new ActionList();
+        var ref13 = new ActionReference();
+        var idLyr = charIDToTypeID( "Lyr " );
+        var idOrdn = charIDToTypeID( "Ordn" );
+        var idTrgt = charIDToTypeID( "Trgt" );
+        ref13.putEnumerated( idLyr, idOrdn, idTrgt );
+        list10.putReference( ref13 );
+        desc38.putList( idnull, list10 );
+        var idTglO = charIDToTypeID( "TglO" );
+        desc38.putBoolean( idTglO, true );
+        executeAction( idShw, desc38, DialogModes.NO );
+    }
 
+    var doc = app.activeDocument;
+    doc.activeLayer = layer;
+    doc.crop(layer.bounds);
     exportDirty(layer);
+    undo(doc);
+    // doc.activeHistoryState = doc.historyStates[doc.historyStates.length - 3];
     // saveImage(makeFileNameFromLayerName(layer, false));
 }
 
