@@ -9,6 +9,7 @@ loadJSX('util.jsx');
 loadJSX('expand.jsx');
 loadJSX('css.jsx');
 loadJSX('layer.jsx');
+loadJSX('controller.jsx');
 loadJSX('main.jsx');
 loadJSX('json2.jsx'); //为 ExtendScript 载入 JSON 库
 // loadJSX('exportFast.jsx');

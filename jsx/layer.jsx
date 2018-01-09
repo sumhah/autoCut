@@ -7,6 +7,7 @@ var Layer = {
 
     init: function () {
         this.reset();
+
         var collect = this.collectLayers();
         this.layers = collect.layers.concat(collect.groups);
         this.groups = collect.groups;
@@ -20,16 +21,15 @@ var Layer = {
         });
 
         this.taggedLayers.sort(function (item1, item2) {
-            var b1 = item1.bounds;
-            var b2 = item2.bounds;
+            var b1 = item1.layer.bounds;
+            var b2 = item2.layer.bounds;
             var w1 = b1[2] - b1[0];
             var w2 = b2[2] - b2[0];
             var h1 = b1[3] - b1[1];
             var h2 = b2[3] - b2[1];
             return w1 * h1 - w2 * h2;
         });
-
-        this.untaggedLayers = this.getUniqueLayer();
+        this.uniqueTaggedLayers = this.getUniqueLayer();
 
         this.hideAllLayer();
     },
@@ -241,8 +241,8 @@ var Layer = {
     getUniqueLayer: function () {
         var uniqueLayers = [];
         this.taggedLayers.each(function (item) {
-            if (uniqueLayers.some(function (uniqueItem) {
-                    return uniqueItem.layer.name === item.layer.name;
+            if (uniqueLayers.every(function (uniqueItem) {
+                    return uniqueItem.layer.name !== item.layer.name;
                 })) {
                 uniqueLayers.push(item);
             }

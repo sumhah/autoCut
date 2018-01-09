@@ -14,7 +14,7 @@ var Controller = {
         this.exportRootDocument();
         this.exportCssFile();
 
-        alert('Done!');
+        undo(this.doc);
     },
 
     reset: function () {
@@ -24,10 +24,11 @@ var Controller = {
     },
 
     createFolder: function () {
-        var folder = new Folder(doc.path + '/source');
+        var folder = new Folder(this.doc.path + '/source');
         if (!folder.exists) {
             folder.create();
         }
+        this.folder = folder;
     },
 
     eachTaggerLayersToExport: function () {
@@ -40,14 +41,21 @@ var Controller = {
                 if (item.layer.typename === 'LayerSet') {
                     groupLayer = item.layer.merge();
                 }
+
                 if (groupLayer) {
-                    self.cssText += Layer.getLayerCss(groupLayer) + '\n';
-                    undo(self.doc);
+                    alert(groupLayer.name);
                 } else {
-                    self.cssText += Layer.getLayerCss(item) + '\n';
+                    alert(item.layer.name);
                 }
 
-                item.layer.visible = false;
+
+                if (groupLayer) {
+                    self.cssText += Layer.getLayerCss(groupLayer) + '\n';
+                } else {
+                    alert(item.layer);
+                    self.cssText += Layer.getLayerCss(item.layer) + '\n';
+                    item.layer.visible = false;
+                }
             });
         }
         catch (e) {
@@ -56,7 +64,7 @@ var Controller = {
     },
 
     exportCssFile: function () {
-        var cssFilePath = folder + '/css.css';
+        var cssFilePath = this.folder + '/css.css';
         var write_file = File(cssFilePath);
 
         if (!write_file.exists) {

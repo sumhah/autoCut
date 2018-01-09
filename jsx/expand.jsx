@@ -74,3 +74,11 @@ Array.prototype.sort = function (fun) {
     }
     return this;
 };
+
+Array.prototype.logName = function () {
+    var names = '';
+    this.each(function (item) {
+        names += '\n' + item.layer.name;
+    });
+    alert(names);
+};

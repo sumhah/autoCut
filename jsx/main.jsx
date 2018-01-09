@@ -1,6 +1,17 @@
-﻿function start() {
+﻿
+function main() {
+    try {
+        Controller.start();
+    }
+    catch (e) {
+        alert(e.message);
+    }
+}
+function start() {
+    var doc = app.activeDocument;
+    main();
     // doc.suspendHistory('please wait...', 'main()');
-    Controller.start();
+    undo(doc);
     return '';
 }
 

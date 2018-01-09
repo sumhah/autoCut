@@ -92,26 +92,27 @@ function exportLayer(layer) {
     }
 
     function onlyCurrentLayerVisible() {
-        var idShw = charIDToTypeID( "Shw " );
+        var idShw = charIDToTypeID('Shw ');
         var desc38 = new ActionDescriptor();
-        var idnull = charIDToTypeID( "null" );
+        var idnull = charIDToTypeID('null');
         var list10 = new ActionList();
         var ref13 = new ActionReference();
-        var idLyr = charIDToTypeID( "Lyr " );
-        var idOrdn = charIDToTypeID( "Ordn" );
-        var idTrgt = charIDToTypeID( "Trgt" );
-        ref13.putEnumerated( idLyr, idOrdn, idTrgt );
-        list10.putReference( ref13 );
-        desc38.putList( idnull, list10 );
-        var idTglO = charIDToTypeID( "TglO" );
-        desc38.putBoolean( idTglO, true );
-        executeAction( idShw, desc38, DialogModes.NO );
+        var idLyr = charIDToTypeID('Lyr ');
+        var idOrdn = charIDToTypeID('Ordn');
+        var idTrgt = charIDToTypeID('Trgt');
+        ref13.putEnumerated(idLyr, idOrdn, idTrgt);
+        list10.putReference(ref13);
+        desc38.putList(idnull, list10);
+        var idTglO = charIDToTypeID('TglO');
+        desc38.putBoolean(idTglO, true);
+        executeAction(idShw, desc38, DialogModes.NO);
     }
 
     var doc = app.activeDocument;
     doc.activeLayer = layer;
     doc.crop(layer.bounds);
     exportDirty(layer);
+    undo(doc);
     undo(doc);
     // doc.activeHistoryState = doc.historyStates[doc.historyStates.length - 3];
     // saveImage(makeFileNameFromLayerName(layer, false));
@@ -1636,6 +1637,7 @@ cssToClip.getTextLayerCSS = function (boundsInfo) {
     var defaultDesc = this.getLayerAttr('textKey.paragraphStyleRange.paragraphStyle.defaultStyle');
     if (!defaultDesc)
         defaultDesc = this.getLayerAttr('textKey.textStyleRange.textStyle.baseParentStyle');
+
     if (textDesc) {
 //		this.addStyleLine2( "font-size: $size$;", textDesc, defaultDesc );
 //         this.addStyleLine2('font-family: "$fontName$";', textDesc, defaultDesc);
@@ -1900,6 +1902,7 @@ cssToClip.gatherLayerCSS = function (layer) {
         layer = app.activeDocument.layers[0];
     }
     app.activeDocument.activeLayer = layer;
+
     var curLayer = this.getCurrentLayer(layer);
 
     // Skip invisible or non-css-able layers.
@@ -1907,28 +1910,31 @@ cssToClip.gatherLayerCSS = function (layer) {
     if (layerKind === kBackgroundSheet)     // Background == pixels. Never in groups.
         layerKind = kPixelSheet;
     if (!this.isCSSLayerKind(layerKind)) {
-        var idrasterizeLayer = stringIDToTypeID( "rasterizeLayer" );
+        var idrasterizeLayer = stringIDToTypeID('rasterizeLayer');
         var desc547 = new ActionDescriptor();
-        var idnull = charIDToTypeID( "null" );
+        var idnull = charIDToTypeID('null');
         var ref213 = new ActionReference();
-        var idLyr = charIDToTypeID( "Lyr " );
-        var idOrdn = charIDToTypeID( "Ordn" );
-        var idTrgt = charIDToTypeID( "Trgt" );
-        ref213.putEnumerated( idLyr, idOrdn, idTrgt );
-        desc547.putReference( idnull, ref213 );
-        executeAction( idrasterizeLayer, desc547, DialogModes.NO );
+        var idLyr = charIDToTypeID('Lyr ');
+        var idOrdn = charIDToTypeID('Ordn');
+        var idTrgt = charIDToTypeID('Trgt');
+        ref213.putEnumerated(idLyr, idOrdn, idTrgt);
+        desc547.putReference(idnull, ref213);
+        executeAction(idrasterizeLayer, desc547, DialogModes.NO);
 
         curLayer = app.activeDocument.activeLayer;
         return this.gatherLayerCSS(curLayer);
     }
 
     var isCSSid = (curLayer.name[0] == '#'); // Flag if generating ID not class
+
     var layerName = this.layerNameToCSS(curLayer.name).substr(0, curLayer.name.length - 1);
 
     this.addText((isCSSid ? '#' : '.') + layerName + ' {');
+
     this.pushIndent();
 
     var boundsInfo = new BoundsParameters();
+
     switch (layerKind) {
         case kLayerGroupSheet:
             this.pushGroupLevel();
@@ -1951,6 +1957,7 @@ cssToClip.gatherLayerCSS = function (layer) {
     //     return false;
 
     // Use the Opacity tag for groups, so it applies to all descendants.
+
     if (layerKind == kLayerGroupSheet)
         this.addOpacity();
     this.addObjectBounds(boundsInfo);
@@ -2102,7 +2109,6 @@ cssToClip.logToHeadlights = function (eventRecord) {
     desc.putString(stringIDToTypeID('eventRecord'), eventRecord);
     executeAction(headlightsActionID, desc, DialogModes.NO);
 };
-
 
 function testProgress() {
     app.doProgress(localize('$$$/Photoshop/Progress/CopyCSSProgress=Copying CSS...'), 'testProgressTask()');
