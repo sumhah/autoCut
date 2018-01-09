@@ -4,7 +4,7 @@ var Controller = {
     cssText: '',
 
     start: function () {
-        this.cssText = '';
+        this.reset();
         var doc = this.doc;
         this.cssText += '.root {\n    left: 0px;\n    top: 0px;\n    width: ' + parseFloat(doc.width) + 'px;\n    height: ' + parseFloat(doc.height) + 'px;\n}\n\n';
 
@@ -15,6 +15,12 @@ var Controller = {
         this.exportCssFile();
 
         alert('Done!');
+    },
+
+    reset: function () {
+        this.doc = app.activeDocument;
+        this.cssText = '';
+        this.Layer.init();
     },
 
     createFolder: function () {
@@ -40,7 +46,7 @@ var Controller = {
                 } else {
                     self.cssText += Layer.getLayerCss(item) + '\n';
                 }
-                
+
                 item.layer.visible = false;
             });
         }

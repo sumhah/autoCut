@@ -6,6 +6,7 @@ var Layer = {
     uniqueTaggedLayers: [],
 
     init: function () {
+        this.reset();
         var collect = this.collectLayers();
         this.layers = collect.layers.concat(collect.groups);
         this.groups = collect.groups;
@@ -31,6 +32,14 @@ var Layer = {
         this.untaggedLayers = this.getUniqueLayer();
 
         this.hideAllLayer();
+    },
+
+    reset: function () {
+        this.layers = [];
+        this.groups = [];
+        this.taggedLayers = [];
+        this.untaggedLayers = [];
+        this.uniqueTaggedLayers = [];
     },
 
     collectLayers: function (progressBarWindow) {
@@ -242,5 +251,3 @@ var Layer = {
     },
 
 };
-
-Layer.init();
