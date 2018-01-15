@@ -14,11 +14,14 @@ loadJSX('main.jsx');
 loadJSX('json2.jsx'); //为 ExtendScript 载入 JSON 库
 // loadJSX('exportFast.jsx');
 
+
 var pop = function () {
     var cs = new CSInterface();
     cs.evalScript('start()', function (result) {
         window.cep.fs.writeFile(__filename + '/css.css', result);
     });
-
-    console.log(222);
 };
+
+function clearFolder() {
+    var result = window.cep.fs.readdir(__dirname );
+}

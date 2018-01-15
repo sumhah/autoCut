@@ -28,6 +28,9 @@ var Controller = {
         if (!folder.exists) {
             folder.create();
         }
+        each(folder.getFiles(), function (file) {
+            file.remove();
+        });
         this.folder = folder;
     },
 
