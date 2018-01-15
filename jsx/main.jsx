@@ -9,8 +9,7 @@ function main() {
 }
 function start() {
     var doc = app.activeDocument;
-    main();
-    // doc.suspendHistory('please wait...', 'main()');
+    doc.suspendHistory('please wait...', 'main()');
     undo(doc);
     return '';
 }

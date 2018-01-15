@@ -31,7 +31,7 @@ var Layer = {
         });
         this.uniqueTaggedLayers = this.getUniqueLayer();
 
-        this.hideAllLayer();
+        // this.hideAllLayer();
     },
 
     reset: function () {

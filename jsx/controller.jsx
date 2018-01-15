@@ -14,7 +14,7 @@ var Controller = {
         this.exportRootDocument();
         this.exportCssFile();
 
-        undo(this.doc);
+        alert('Done!');
     },
 
     reset: function () {
@@ -43,16 +43,8 @@ var Controller = {
                 }
 
                 if (groupLayer) {
-                    alert(groupLayer.name);
-                } else {
-                    alert(item.layer.name);
-                }
-
-
-                if (groupLayer) {
                     self.cssText += Layer.getLayerCss(groupLayer) + '\n';
                 } else {
-                    alert(item.layer);
                     self.cssText += Layer.getLayerCss(item.layer) + '\n';
                     item.layer.visible = false;
                 }

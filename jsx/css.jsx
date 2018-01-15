@@ -31,6 +31,8 @@ function exportDirty(layer) {
     exportOptions.transparency = true;
     exportOptions.interlaced = false;
     exportOptions.quality = 100;
+
+
     var filePath = doc.path + '/source/' + layer.name.substr(0, layer.name.length - 1) + '.png';
     var fileOut = new File(filePath);
     var b1 = layer.bounds;
@@ -38,12 +40,12 @@ function exportDirty(layer) {
     var h = b1[3] - b1[1];
     var temp;
 
-    // layer.copy();
-    // app.documents.add(w, h, 72, 'temp', NewDocumentMode.RGB, DocumentFill.TRANSPARENT, 1);
-    // temp = app.activeDocument;
-    // temp.paste();
-    doc.exportDocument(fileOut, ExportType.SAVEFORWEB, exportOptions);
-    // temp.close(SaveOptions.DONOTSAVECHANGES);
+    layer.copy();
+    app.documents.add(w, h, 72, 'temp', NewDocumentMode.RGB, DocumentFill.TRANSPARENT, 1);
+    temp = app.activeDocument;
+    temp.paste();
+    temp.exportDocument(fileOut, ExportType.SAVEFORWEB, exportOptions);
+    temp.close(SaveOptions.DONOTSAVECHANGES);
 }
 
 function exportLayer(layer) {
@@ -107,15 +109,7 @@ function exportLayer(layer) {
         desc38.putBoolean(idTglO, true);
         executeAction(idShw, desc38, DialogModes.NO);
     }
-
-    var doc = app.activeDocument;
-    doc.activeLayer = layer;
-    doc.crop(layer.bounds);
     exportDirty(layer);
-    undo(doc);
-    undo(doc);
-    // doc.activeHistoryState = doc.historyStates[doc.historyStates.length - 3];
-    // saveImage(makeFileNameFromLayerName(layer, false));
 }
 
 $.localize = true;
@@ -1750,6 +1744,7 @@ cssToClip.getTextLayerCSS = function (boundsInfo) {
 cssToClip.getPixelLayerCSS = function () {
     var name = this.getLayerAttr('name');
     // If suffix isn't present, add one.  Assume file is in same folder as parent.
+
     if (name.search(/[.]((\w){3,4})$/) < 0) {
         this.addStyleLine('background-image: url("$name$.png");');
     }
@@ -1768,6 +1763,7 @@ cssToClip.getPixelLayerCSS = function () {
 
         this.addText('background-image: url("' + docFolder + name.substr(0, name.length - 1) + '");');
     }
+
     var fillOpacity = this.getLayerAttr('fillOpacity') / 255.0;
     this.addOpacity(this.getLayerAttr('opacity') * fillOpacity);
 
