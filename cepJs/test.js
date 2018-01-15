@@ -19,4 +19,6 @@ var pop = function () {
     cs.evalScript('start()', function (result) {
         window.cep.fs.writeFile(__filename + '/css.css', result);
     });
+
+    console.log(222);
 };
