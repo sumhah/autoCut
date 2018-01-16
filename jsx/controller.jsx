@@ -8,7 +8,6 @@ var Controller = {
         var doc = this.doc;
         this.cssText += '.root {\n    left: 0px;\n    top: 0px;\n    width: ' + parseFloat(doc.width) + 'px;\n    height: ' + parseFloat(doc.height) + 'px;\n}\n\n';
 
-        // todo 清空文件夹
         this.createFolder();
         this.eachTaggerLayersToExport();
         this.exportRootDocument();
@@ -38,7 +37,7 @@ var Controller = {
         try {
             var self = this;
             var Layer = this.Layer;
-            this.Layer.uniqueTaggedLayers.each(function (item) {
+            this.Layer.uniqueTaggedLayers.forEach(function (item) {
                 makeLayerVisible(item);
                 var groupLayer;
                 if (item.layer.typename === 'LayerSet') {

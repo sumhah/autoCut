@@ -7,7 +7,14 @@ function loadJSX(fileName) {
 
 loadJSX('util.jsx');
 loadJSX('expand.jsx');
-loadJSX('css.jsx');
+
+loadJSX('css/const.jsx');
+loadJSX('css/ActionDescriptor.jsx');
+loadJSX('css/ProgressBar.jsx');
+loadJSX('css/PSLayer.jsx');
+loadJSX('css/CSSToClipboard.jsx');
+
+
 loadJSX('layer.jsx');
 loadJSX('controller.jsx');
 loadJSX('main.jsx');

@@ -12,7 +12,7 @@ var Layer = {
         this.layers = collect.layers.concat(collect.groups);
         this.groups = collect.groups;
 
-        this.layers.each(function (item) {
+        this.layers.forEach(function (item) {
             if (/[\w\W]+\$$/.test(item.layer.name)) {
                 Layer.taggedLayers.push(item);
             } else {
@@ -233,14 +233,14 @@ var Layer = {
     },
 
     hideAllLayer: function () {
-        this.layers.each(function (item) {
+        this.layers.forEach(function (item) {
             item.layer.visible = false;
         });
     },
 
     getUniqueLayer: function () {
         var uniqueLayers = [];
-        this.taggedLayers.each(function (item) {
+        this.taggedLayers.forEach(function (item) {
             if (uniqueLayers.every(function (uniqueItem) {
                     return uniqueItem.layer.name !== item.layer.name;
                 })) {

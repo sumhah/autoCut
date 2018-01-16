@@ -1,5 +1,5 @@
 
-Array.prototype.each = function (callback) {
+Array.prototype.forEach = function (callback) {
     for (var i = 0, len = this.length; i < len; i += 1) {
         callback(this[i], i, len);
     }
@@ -8,7 +8,7 @@ Array.prototype.each = function (callback) {
 
 Array.prototype.filter = function (callback) {
     var subArr = [];
-    this.each(function (item, i, len) {
+    this.forEach(function (item, i, len) {
         if (callback(item, i, len)) {
             subArr.push(item);
         }
@@ -18,7 +18,7 @@ Array.prototype.filter = function (callback) {
 
 Array.prototype.some = function (callback) {
     var isHave = false;
-    this.each(function (item, i, len) {
+    this.forEach(function (item, i, len) {
         if (callback(item, i, len)) {
             isHave = true;
         }
@@ -28,7 +28,7 @@ Array.prototype.some = function (callback) {
 
 Array.prototype.every = function (callback) {
     var isHave = true;
-    this.each(function (item, i, len) {
+    this.forEach(function (item, i, len) {
         if (!callback(item, i, len)) {
             isHave = false;
         }
@@ -38,7 +38,7 @@ Array.prototype.every = function (callback) {
 
 Array.prototype.map = function (callback) {
     var subArr = [];
-    this.each(function (item, i, len) {
+    this.forEach(function (item, i, len) {
         subArr.push(callback(item, i, len));
     });
     return subArr;
@@ -77,7 +77,7 @@ Array.prototype.sort = function (fun) {
 
 Array.prototype.logName = function () {
     var names = '';
-    this.each(function (item) {
+    this.forEach(function (item) {
         names += '\n' + item.layer.name;
     });
     alert(names);
