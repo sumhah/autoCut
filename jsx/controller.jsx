@@ -23,7 +23,7 @@ var Controller = {
     },
 
     createFolder: function () {
-        var folder = new Folder(this.doc.path + '/source');
+        var folder = new Folder(sourcePath);
         if (!folder.exists) {
             folder.create();
         }
@@ -91,7 +91,7 @@ var Controller = {
         exportOptions.transparency = true;
         exportOptions.interlaced = false;
         exportOptions.quality = 100;
-        var filePath = doc.path + '/source/' + fileName + '.png';
+        var filePath = sourcePath + fileName + '.png';
         var fileOut = new File(filePath);
         doc.exportDocument(fileOut, ExportType.SAVEFORWEB, exportOptions);
     },

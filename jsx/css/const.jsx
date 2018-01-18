@@ -4,7 +4,9 @@
 
 $.localize = true;
 
+var pluginPath = $.fileName.substring(0, $.fileName.lastIndexOf('/jsx/css'));
 
+var sourcePath = pluginPath + '/source/';
 // Constants for accessing PS event functionality.  In the interests of speed
 // we're defining just the ones used here, rather than sucking in a general defs file.
 const classApplication = app.charIDToTypeID('capp');

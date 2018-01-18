@@ -52,7 +52,7 @@ function exportDirty(layer) {
     exportOptions.interlaced = false;
     exportOptions.quality = 100;
 
-    var filePath = doc.path + '/source/' + layer.name.substr(0, layer.name.length - 1) + '.png';
+    var filePath = sourcePath + layer.name.substr(0, layer.name.length - 1) + '.png';
     var fileOut = new File(filePath);
     var b1 = layer.bounds;
     var w = b1[2] - b1[0];
