@@ -22,7 +22,6 @@ global.spend = (fn, name) => {
 
 // 在矩形边界线也算在矩形里
 global.isInRect = (p, rect) => {
-    console.log(rect.x2 >= p.x && rect.x1 <= p.x && rect.y2 >= p.y && rect.y1 <= p.y);
     return rect.x2 >= p.x && rect.x1 <= p.x && rect.y2 >= p.y && rect.y1 <= p.y;
 };
 

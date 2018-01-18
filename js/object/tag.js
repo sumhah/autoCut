@@ -213,7 +213,7 @@ class Tag extends Box {
             case 'text':
                 [
                     'font-size',
-                    'line-height',
+                    // 'line-height',
                     'color'
                 ].forEach(prop => this._absorbPropFromCssInfo(prop));
 
@@ -221,7 +221,12 @@ class Tag extends Box {
                 const fontSize = parseFloat(cssInfo['font-size']);
                 const fontNumberPerLine = Math.floor(this.width / fontSize);
                 const lineNumber = Math.floor(this.height / (fontSize * parseFloat(cssInfo['line-height'])));
-                this.textContent = '哈'.repeat(fontNumberPerLine * Math.max(1, lineNumber));
+
+                if (this.cssInfo['text-content']) {
+                    this.textContent = this.cssInfo['text-content'].replace(/\r/g, '<br>');
+                } else {
+                    this.textContent = '哈'.repeat(fontNumberPerLine * Math.max(1, lineNumber));
+                }
                 break;
             case 'image':
                 this.cssObj['background-image'] = `url('../images/${this.name}.png')`;
@@ -240,6 +245,7 @@ class Tag extends Box {
                     'border-radius',
                     'background-image',
                     'background-color',
+                    'box-shadow',
                 ].forEach(prop => this._absorbPropFromCssInfo(prop));
 
                 if (this.cssObj['border-style']) {
@@ -262,7 +268,11 @@ class Tag extends Box {
          * 3.对每个类的属性进行排序 √
          */
         // todo tagCleaner => tagOutputTool
-        this.cssObj['width'] = this._getCssWidth().toUnit();
+
+        // 文字图层暂不输出宽度，待精准判断后智能缩放宽度再开启
+        if (this.type !== 'text') {
+            this.cssObj['width'] = this._getCssWidth().toUnit();
+        }
         this.cssObj['height'] = this._getCssHeight().toUnit();
 
         if (this.isRoot) {

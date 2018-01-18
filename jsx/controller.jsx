@@ -39,15 +39,15 @@ var Controller = {
             var Layer = this.Layer;
             this.Layer.uniqueTaggedLayers.forEach(function (item) {
                 makeLayerVisible(item);
-                var groupLayer;
-                if (item.layer.typename === 'LayerSet') {
-                    groupLayer = item.layer.merge();
+                var groupLayer, curLayer = item.layer;
+                if (curLayer.typename === 'LayerSet') {
+                    groupLayer = curLayer.merge();
                 }
 
                 if (groupLayer) {
                     self.cssText += Layer.getLayerCss(groupLayer) + '\n';
                 } else {
-                    self.cssText += Layer.getLayerCss(item.layer) + '\n';
+                    self.cssText += Layer.getLayerCss(curLayer) + '\n';
                     item.layer.visible = false;
                 }
             });
