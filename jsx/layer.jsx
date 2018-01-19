@@ -162,10 +162,8 @@ var Layer = {
                         else {
                             var group = {layer: activeLayer, parent: currentGroup, children: []};
                             group.visible = (layerVisible && visibleInGroup[visibleInGroup.length - 1]);
-                            if (group.parent == null) {
-                                groups.push(group);
-                            }
-                            else {
+                            groups.push(group);
+                            if (group.parent) {
                                 group.parent.children.push(group);
                             }
                             currentGroup = group;
