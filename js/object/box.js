@@ -24,10 +24,6 @@ class Box {
         this.y1 = this.y;
         this.x2 = this.x + this.width;
         this.y2 = this.y + this.height;
-        this.left = this.x1;
-        this.right = this.x2;
-        this.top = this.y1;
-        this.bottom = this.y2;
         this.points = [
             {
                 x: this.x,

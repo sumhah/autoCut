@@ -66,6 +66,7 @@ class TagController {
         }
         body {
             font-size: 0;
+            line-height: 1;
         }
     </style>
     <link rel="stylesheet" href="./css/index.css" />

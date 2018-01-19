@@ -66,6 +66,8 @@ class Tag extends Box {
         } else {
             this._setLeft();
             this._setTop();
+            this._setRight();
+            this._setBottom();
         }
     }
 
@@ -192,6 +194,14 @@ class Tag extends Box {
         this.top = this.y - this.lateParent.y - this.lateParent.borderWidth;
     }
 
+    _setRight() {
+        this.right = (this.lateParent.x2 + this.lateParent.borderWidth) - this.x2;
+    }
+
+    _setBottom() {
+        this.bottom = (this.lateParent.y2 + this.lateParent.borderWidth) - this.y2;
+    }
+
     _getCssWidth() {
         return this.width - this.borderWidth * 2;
     }
@@ -313,8 +323,16 @@ class Tag extends Box {
         } else {
             // 元素是绝对定位的盒子
             this.cssObj['position'] = 'absolute';
-            this.cssObj['top'] = this.top.toUnit();
-            this.cssObj['left'] = this.left.toUnit();
+            this.cssObj['left'] = distance(this.left, this.right) < 2 ? '50%' : this.left.toUnit();
+            this.cssObj['top'] = distance(this.top, this.bottom) < 2 ? '50%' : this.top.toUnit();
+
+            if (this.cssObj['left'] === '50%' && this.cssObj['top'] === '50%') {
+                this.cssObj['transform'] = 'translate(-50%, -50%)';
+            } else if (this.cssObj['left'] === '50%') {
+                this.cssObj['transform'] = 'translate(-50%, 0)';
+            } else if (this.cssObj['top'] === '50%') {
+                this.cssObj['transform'] = 'translate(0, -50%)';
+            }
         }
     }
 
