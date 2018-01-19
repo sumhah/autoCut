@@ -20,7 +20,7 @@ class TagController {
         console.log(this);
     }
 
-    call(fnName, arg) {
+    eachCall(fnName, arg) {
         for (let item of this._arr) {
             item[fnName](arg);
         }
@@ -32,17 +32,17 @@ class TagController {
          *  son && parent => lateParent => lateSon => siblings => css
          */
         // 顺序流程
-        this.call('calcSonAndParent', this._arr)
-            .call('sortParents')
-            .call('calcLateParent')
-            .call('calcLateSon')
-            .call('calcSibship')
-            .call('setPosition')
-            .call('calcStardardSiblings')
-            .call('calcYCloseSiblings')
-            .call('calcCss')
-            .call('setCssObj')
-            .call('cleanCss')
+        this.eachCall('calcSonAndParent', this._arr)
+            .eachCall('sortParents')
+            .eachCall('calcLateParent')
+            .eachCall('calcLateSon')
+            .eachCall('calcSibship')
+            .eachCall('setPosition')
+            .eachCall('calcStardardSiblings')
+            .eachCall('calcYCloseSiblings')
+            .eachCall('calcCss')
+            .eachCall('setCssObj')
+            .eachCall('cleanCss')
     }
 
     echo() {
@@ -60,15 +60,12 @@ class TagController {
         doc.style.fontSize = doc.clientWidth / 320 * 20 + 'px';
     </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-        }
         body {
             font-size: 0;
             line-height: 1;
         }
     </style>
+    <link rel="stylesheet" href="../css/reset.css" />
     <link rel="stylesheet" href="./css/index.css" />
     <title>Title</title>
 </head>
