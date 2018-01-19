@@ -74,7 +74,7 @@ class TagController {
 </html>`;
         const echoCss = root.echoCSS();
         this.html = html;
-        this.vue = `<template>${root.echoHTML(4)}
+        this.vue = `<template>${root.echoHTML(HTML_INDENT)}
 </template>
 
 <script>

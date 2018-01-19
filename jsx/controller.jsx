@@ -46,6 +46,7 @@ var Controller = {
 
                 if (groupLayer) {
                     self.cssText += Layer.getLayerCss(groupLayer) + '\n';
+                    groupLayer.visible = false;
                 } else {
                     self.cssText += Layer.getLayerCss(curLayer) + '\n';
                     item.layer.visible = false;
