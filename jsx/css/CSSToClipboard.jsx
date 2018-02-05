@@ -711,6 +711,7 @@ cssToClip.getPixelLayerCSS = function () {
     var name = this.getLayerAttr('name');
     // If suffix isn't present, add one.  Assume file is in same folder as parent.
 
+
     if (name.search(/[.]((\w){3,4})$/) < 0) {
         this.addStyleLine('background-image: url("$name$.png");');
     }

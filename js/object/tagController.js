@@ -97,7 +97,7 @@ class TagController {
 
 <style lang="scss" src="./scss/index.scss"></style>
 `;
-        this.css = echoCss.css.replace(/(\d+)px/g, (value, num) => {
+        this.css = echoCss.css.replace(/([\d.]+)px/g, (value, num) => {
             return parseFloat(num) / (root.width / 640 * 40) + 'rem';
         });
         this.scss = echoCss.scss;

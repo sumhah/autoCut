@@ -40,16 +40,19 @@ var Controller = {
             this.Layer.uniqueTaggedLayers.forEach(function (item) {
                 makeLayerVisible(item);
                 var groupLayer, curLayer = item.layer;
+
                 if (curLayer.typename === 'LayerSet') {
                     groupLayer = curLayer.merge();
                 }
 
                 if (groupLayer) {
                     self.cssText += Layer.getLayerCss(groupLayer) + '\n';
-                    groupLayer.visible = false;
+                    groupLayer.remove();
+                    // groupLayer.visible = false;
                 } else {
                     self.cssText += Layer.getLayerCss(curLayer) + '\n';
-                    item.layer.visible = false;
+                    curLayer.remove();
+                    // item.layer.visible = false;
                 }
             });
         }

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionList>
+  <Extension Id="my_panel">
+  <HostList>
+    <Host Name="PHXS" Port="9000" />
+    <Host Name="PHSP" Port="9001" />
+    <Host Name="IDSN" Port="9002" />
+    <Host Name="AICY" Port="9002" />
+    <Host Name="ILST" Port="9003" />
+    <Host Name="PPRO" Port="9004" />
+    <Host Name="PRLD" Port="9005" />
+    <Host Name="AEFT" Port="9006" />
+    <Host Name="FLPR" Port="9007" />
+    <Host Name="AUDT" Port="9008" />
+    <Host Name="DRWV" Port="9009" />
+    <Host Name="MUSE" Port="9010" />
+    <Host Name="KBRG" Port="9011" />
+  </HostList>
+  </Extension>
+</ExtensionList>

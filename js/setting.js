@@ -65,6 +65,6 @@ global.INHERITABLE_PROP = [
 global.HTML_INDENT = 4;
 global.CSS_INDENT = 4;
 
-global.MODE = 'absol';
+global.MODE = 'absolute';
 
 global.PAGE_NAME = 'index';

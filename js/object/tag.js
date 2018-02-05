@@ -240,7 +240,7 @@ class Tag extends Box {
                 break;
             case 'image':
                 this.cssObj['background-image'] = `url('../images/${this.name}.png')`;
-                this.cssObj['background-size'] = '100%';
+                this.cssObj['background-size'] = '100% 100%';
                 break;
             case 'shape':
                 [

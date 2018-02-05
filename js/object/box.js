@@ -81,7 +81,11 @@ class Box {
         /**
          * todo 卫星类图层
          * 根据重叠面积 与 2个图层面积的比例
+         * root无视面积，永远包含所有
          */
+        if (this.name === 'root' && item.name !== 'root') {
+            return true;
+        }
 
         return this.isSon(item) || (isIntersect(item, this) && (this.area / item.area) > 1);
     }
