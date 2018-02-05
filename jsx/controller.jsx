@@ -48,11 +48,9 @@ var Controller = {
                 if (groupLayer) {
                     self.cssText += Layer.getLayerCss(groupLayer) + '\n';
                     groupLayer.remove();
-                    // groupLayer.visible = false;
                 } else {
                     self.cssText += Layer.getLayerCss(curLayer) + '\n';
                     curLayer.remove();
-                    // item.layer.visible = false;
                 }
             });
         }

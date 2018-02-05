@@ -111,7 +111,7 @@ class Box {
 
     calcSonAndParent(arr) {
         arr.forEach((item) => {
-            if (item !== this && item.isYieldToMe(this)) {
+            if (item !== this && item.isSon(this)) {
                 item.addSon(this);
                 this.addParent(item);
             }
