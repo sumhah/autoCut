@@ -87,10 +87,10 @@ class Box {
             return true;
         }
 
-        return this.isSon(item) || (isIntersect(item, this) && (this.area / item.area) > 1);
+        return this.isSon(item) || (this.area > item.area && getIntersectArea(item, this) / item.area > 0.5);
     }
 
-    // todo 已被isYieldToMe代替
+    // todo 暂用isSon
     isSon(obj) {
         const x1 = obj.x, x2 = obj.x + obj.width,
             y1 = obj.y, y2 = obj.y + obj.height;
@@ -111,7 +111,7 @@ class Box {
 
     calcSonAndParent(arr) {
         arr.forEach((item) => {
-            if (item !== this && item.isSon(this)) {
+            if (item !== this && item.isYieldToMe(this)) {
                 item.addSon(this);
                 this.addParent(item);
             }
@@ -148,7 +148,7 @@ class Box {
         if (this.name === 'root') {
             this.siblings = [];
         } else {
-            console.log(this.name);
+            console.log(this.name, this, this.lateParent);
             this.siblings = this.lateParent.lateSons;
         }
     }
