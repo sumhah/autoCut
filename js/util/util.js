@@ -25,22 +25,20 @@ global.isInRect = (p, rect) => {
     return rect.x2 >= p.x && rect.x1 <= p.x && rect.y2 >= p.y && rect.y1 <= p.y;
 };
 
-global.isIntersect = (o1, o2) => {
-    const points = o1.points;
-    return isInRect(points[0], o2) || isInRect(points[1], o2) || isInRect(points[2], o2) || isInRect(points[3], o2);
+global.isIntersect = (box1, box2) => {
+    // o1中间  o2外围
+    // o2在左边  右边   上  下
+    return !(box1.x > box2.x2 || box1.x2 < box2.x || box1.y > box2.y2 || box1.y2 < box2.y);
 };
 
 global.getIntersectArea = (box1, box2) => {
     if (!isIntersect(box1, box2)) {
         return 0;
     }
-
     let leftDownX = Math.max(box1.x, box2.x);
     let leftDownY = Math.min(box1.y2, box2.y2);
     let rightUpX = Math.min(box1.x2, box2.x2);
     let rightUpY = Math.max(box1.y, box2.y);
-
-    console.log(box1.name, box2.name, (rightUpX - leftDownX) * (leftDownY - rightUpY));
     return (rightUpX - leftDownX) * (leftDownY - rightUpY);
 };
 
