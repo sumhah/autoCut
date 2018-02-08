@@ -12,28 +12,16 @@ class Tag extends Box {
     constructor(cssInfo) {
         super(cssInfo);
         this.cssInfo = cssInfo;
+        this.type = this.getTagType(cssInfo);
         this.className = this.name;
         this.textContent = '';
-        this.standardSiblings = [];
         this.zIndex = cssInfo['z-index'] ? parseInt(cssInfo['z-index']) : 0;
-        this.type = this.getTagType(cssInfo);
         this.cssObj = {};
         this.cssArr = [];
         this.isRoot = this.name === 'root';
         this.inheritCssObj = {};
         this.borderWidth = 0;
         this.paddingTop = 0;
-    }
-
-    calcStardardSiblings() {
-        this.standardSiblings = this.siblings.filter(item => !item.isConflict);
-    }
-
-    calcYCloseSiblings() {
-        // 改动YCloseSiblings
-        // YClose现在依赖于standardSiblings的有序
-        // todo 此处的条件待改善
-        this.YCloseSiblings = this.standardSiblings.filter(item => distance(item.y, this.y) <= 16);
     }
 
     getTagType(cssInfo) {
@@ -113,14 +101,12 @@ class Tag extends Box {
             delete this.cssObj[prop];
         });
 
-
         // todo 搜索siblings里如果有相同的不可继承属性， 用相同类名声明
     }
 
     setPosition() {
         if (this.isRoot) {
             this.isAbsolute = false;
-            console.log(this);
             return;
         }
 

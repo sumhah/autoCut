@@ -38,7 +38,7 @@ class TagController {
             .eachCall('calcLateSon')
             .eachCall('calcSibship')
             .eachCall('setPosition')
-            .eachCall('calcStardardSiblings')
+            .eachCall('calcStandardSiblings')
             .eachCall('calcYCloseSiblings')
             .eachCall('calcCss')
             .eachCall('setCssObj')
@@ -57,7 +57,7 @@ class TagController {
     <meta name="renderer" content="webkit">
     <script>
         const doc = document.documentElement;
-        doc.style.fontSize = doc.clientWidth / 320 * 20 + 'px';
+        doc.style.fontSize = doc.clientWidth / ${BASE_PAGE_WIDTH} * ${ROOT_FONT_SIZE} + 'px';
     </script>
     <style>
         body {
@@ -98,7 +98,7 @@ class TagController {
 <style lang="scss" src="./scss/index.scss"></style>
 `;
         this.css = echoCss.css.replace(/([\d.]+)px/g, (value, num) => {
-            return parseFloat(num) / (root.width / 640 * 40) + 'rem';
+            return parseFloat(num) / (root.width / PAGE_WIDTH_TO_REM_RATIO) + 'rem';
         });
         this.scss = echoCss.scss;
     }
