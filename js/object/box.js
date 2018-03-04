@@ -92,7 +92,7 @@ class Box extends Rect {
         if (this.name === 'root') {
             this.siblings = [];
         } else {
-            console.log(this.name, this, this.lateParent);
+            // console.log(this.name, this, this.lateParent);
             this.siblings = this.lateParent.lateSons;
         }
     }

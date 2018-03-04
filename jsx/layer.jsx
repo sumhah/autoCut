@@ -13,7 +13,7 @@ var Layer = {
         this.groups = collect.groups;
 
         this.layers.forEach(function (item) {
-            if (/[\w\W]+\$$/.test(item.layer.name)) {
+            if (/[\w\W]+@$/.test(item.layer.name)) {
                 Layer.taggedLayers.push(item);
             } else {
                 Layer.untaggedLayers.push(item);

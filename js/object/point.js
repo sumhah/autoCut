@@ -12,6 +12,4 @@ class Point {
     isInRect(rect) {
         return rect.x2 >= this.x && rect.x1 <= this.x && rect.y2 >= this.y && rect.y1 <= this.y;
     }
-
-
 }
