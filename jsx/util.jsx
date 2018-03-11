@@ -1,7 +1,3 @@
-function log(str) {
-    $.writeln(str);
-}
-
 function makeLayerVisible(item) {
     item.layer.visible = true;
 
@@ -21,16 +17,19 @@ function undo(doc) {
 function rgbToHex(r, g, b) {
     return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 };
+
 function each(arr, callback) {
     for (var i = 0, len = arr.length; i < len; i += 1) {
         callback(arr[i], i, len);
     }
 }
+
 function pushArr(arr, subArr) {
     each(subArr, function (item) {
         arr.push(item);
     });
 }
+
 function filter(arr, callback) {
     var newArr = [];
     for (var i = 0, len = arr.length; i < len; i += 1) {

@@ -7,7 +7,6 @@ require('../util/expand');
 const Box = require('./box');
 
 // todo 绝对定位的元素内容递增的情况极少，可先使用:绝对定位继承关系
-
 class Tag extends Box {
     constructor(cssInfo) {
         super(cssInfo);

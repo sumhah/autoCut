@@ -52,10 +52,12 @@ var Controller = {
                     self.cssText += Layer.getLayerCss(curLayer) + '\n';
                     curLayer.remove();
                 }
+
+                console.log(self.cssText);
             });
         }
         catch (e) {
-            alert(e.message);
+            console.log(e.message);
         }
     },
 
