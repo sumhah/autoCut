@@ -37,9 +37,12 @@ var Controller = {
         try {
             var self = this;
             var Layer = this.Layer;
+            console.log(this.Layer.uniqueTaggedLayers);
             this.Layer.uniqueTaggedLayers.forEach(function (item) {
                 makeLayerVisible(item);
                 var groupLayer, curLayer = item.layer;
+
+                console.log(item.layer.name);
 
                 if (curLayer.typename === 'LayerSet') {
                     groupLayer = curLayer.merge();
@@ -53,7 +56,6 @@ var Controller = {
                     curLayer.remove();
                 }
 
-                console.log(self.cssText);
             });
         }
         catch (e) {

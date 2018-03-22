@@ -66,7 +66,7 @@ class TagController {
         }
     </style>
     <link rel="stylesheet" href="../css/reset.css" />
-    <link rel="stylesheet" href="./css/index.css" />
+    <link rel="stylesheet" href="./css/${PAGE_NAME}.css" />
     <title>Title</title>
 </head>
 <body>${root.echoHTML()}
@@ -95,7 +95,7 @@ class TagController {
     };
 </script>
 
-<style lang="scss" src="./scss/index.scss"></style>
+<style lang="scss" src="./scss/${PAGE_NAME}.scss"></style>
 `;
         this.css = echoCss.css.replace(/([\d.]+)px/g, (value, num) => {
             return parseFloat(num) / (root.width / PAGE_WIDTH_TO_REM_RATIO) + 'rem';
