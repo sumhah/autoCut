@@ -14,6 +14,20 @@ function start() {
     return '';
 }
 
+function test() {
+    console.log(2);
+
+    try {
+
+    }
+    catch (e) {
+        console.log(e.message);
+    }
+
+
+
+    console.log(1);
+}
 
 
 

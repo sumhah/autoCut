@@ -275,6 +275,8 @@ class Tag extends Box {
             this.cssObj['overflow'] = 'hidden';
             this.cssObj['margin-left'] = 'auto';
             this.cssObj['margin-right'] = 'auto';
+            this.cssObj['font-size'] = '0';
+            this.cssObj['line-height'] = '1';
             this.cssObj['background-image'] = `url('../images/bg.png')`;
             this.cssObj['background-size'] = `100%`;
             return;

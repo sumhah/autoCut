@@ -10,6 +10,14 @@ function makeLayerVisible(item) {
     }
 }
 
+function makeLayerHide(layer) {
+    layer.visible = false;
+
+    while (layer.visible) {
+        layer.visible = false;
+    }
+}
+
 function undo(doc) {
     doc.activeHistoryState = doc.historyStates[doc.historyStates.length - 2];
 }

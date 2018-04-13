@@ -37,7 +37,9 @@ var Controller = {
         try {
             var self = this;
             var Layer = this.Layer;
-            console.log(this.Layer.uniqueTaggedLayers);
+            this.Layer.uniqueTaggedLayers.forEach(function (item) {
+                console.log(item.layer.name);
+            });
             this.Layer.uniqueTaggedLayers.forEach(function (item) {
                 makeLayerVisible(item);
                 var groupLayer, curLayer = item.layer;
@@ -51,8 +53,10 @@ var Controller = {
                 if (groupLayer) {
                     self.cssText += Layer.getLayerCss(groupLayer) + '\n';
                     groupLayer.remove();
+                    // makeLayerHide(item);
                 } else {
                     self.cssText += Layer.getLayerCss(curLayer) + '\n';
+                    // makeLayerHide(item);
                     curLayer.remove();
                 }
 

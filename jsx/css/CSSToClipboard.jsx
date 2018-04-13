@@ -484,15 +484,11 @@ cssToClip.addObjectBounds = function (boundsInfo) {
 cssToClip.getShapeLayerCSS = function (boundsInfo) {
     // If we have AGM stroke style info, generate that.
     var agmDesc = this.getLayerAttr('AGMStrokeStyleInfo');
-    console.log(agmDesc);
     boundsInfo.borderWidth = 0;
     var opacity = this.getLayerAttr('opacity');
 
     if (agmDesc && agmDesc.getVal('strokeEnabled')) {
         // Assumes pixels!
-        console.log(agmDesc.getVal('strokeStyleLineWidth'));
-        console.log(agmDesc.getVal(['strokeStyleContent', 'color']));
-        console.log(agmDesc.getVal('strokeStyleLineDashSet'));
         boundsInfo.borderWidth = makeUnitVal(agmDesc.getVal('strokeStyleLineWidth'));
         this.addStyleLine('border-width: $strokeStyleLineWidth$;', agmDesc);
         this.addStyleLine('border-color: $strokeStyleContent.color$;', agmDesc);

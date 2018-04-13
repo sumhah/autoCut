@@ -42,3 +42,20 @@ const pop = () => {
         window.cep.fs.writeFile(__filename + '/css.css', result);
     });
 };
+
+const test = () => {
+    const cs = new CSInterface();
+    cs.evalScript('test()', (result) => {
+    });
+};
+
+var event = new CSEvent("com.adobe.PhotoshopRegisterEvent", "APPLICATION");  //创建一个“注册事件”
+event.extensionId = cs.getExtensionID(); //设置“注册事件” extensionId 为你扩展的扩展ID
+event.data = "1936483188"; // 想要监听的 ExtendScript 事件 eventID , 这里是创建图层对象事件: "Mk  "=1298866208
+cs.dispatchEvent(event); //发送“注册事件”，完成注册
+
+cs.addEventListener("com.adobe.PhotoshopJSONCallback" + cs.getExtensionID(), function () {
+    console.log(1000);
+});
+
+// 完美
