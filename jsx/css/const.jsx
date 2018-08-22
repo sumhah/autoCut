@@ -270,3 +270,5 @@ function getFlatType(desc, ID) {
             return desc.getType(ID).toString();
     }
 }
+
+var descCache = []

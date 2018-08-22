@@ -106,9 +106,7 @@ cssToClip.getPSAttr = function (keyStr, objectClass) {
     var ref = new ActionReference();
     ref.putProperty(classProperty, makeID(keyList[0]));
     ref.putEnumerated(objectClass, typeOrdinal, enumTarget);
-
     var resultDesc = executeActionGet(ref);
-
     return resultDesc.getVal(keyList);
 };
 
@@ -488,7 +486,6 @@ cssToClip.getShapeLayerCSS = function (boundsInfo) {
     var opacity = this.getLayerAttr('opacity');
 
     if (agmDesc && agmDesc.getVal('strokeEnabled')) {
-        // Assumes pixels!
         boundsInfo.borderWidth = makeUnitVal(agmDesc.getVal('strokeStyleLineWidth'));
         this.addStyleLine('border-width: $strokeStyleLineWidth$;', agmDesc);
         this.addStyleLine('border-color: $strokeStyleContent.color$;', agmDesc);
@@ -543,16 +540,14 @@ cssToClip.getShapeLayerCSS = function (boundsInfo) {
     }
 
     var i, gradientCSS = this.gradientToCSS();
-    if (!agmDesc 	// If AGM object, only fill if explictly turned on
-        || (agmDesc && agmDesc.getVal('fillEnabled'))) {
+    if (!agmDesc || (agmDesc && agmDesc.getVal('fillEnabled'))) {
         if (gradientCSS) {
             for (i in this.browserTags) {
                 if (this.browserTags.hasOwnProperty(i)) {
                     this.addText('background-image: ' + this.browserTags[i] + gradientCSS);
                 }
             }
-        }
-        else {
+        } else {
             var fillOpacity = this.getLayerAttr('fillOpacity') / 255.0;
             if (fillOpacity < 1.0)
                 this.addRGBAColor('background-color', fillOpacity, this.getLayerAttr('adjustment'));

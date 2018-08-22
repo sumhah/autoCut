@@ -1,13 +1,13 @@
 ﻿function start() {
     var doc = app.activeDocument;
-    try {
-        Controller.start();
-    } catch (e) {
-        console.log(e);
-    }
+    // try {
+    //     Controller.start();
+    // } catch (e) {
+    //     console.log(e);
+    // }
     // doc.suspendHistory('please wait...', 'main()');
     // undo(doc);
-
+    new CSS(doc.activeLayer)
     return '';
 }
 

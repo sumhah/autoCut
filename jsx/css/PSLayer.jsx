@@ -48,7 +48,7 @@ PSLayerInfo.prototype.getLayerAttr = function (keyString, layerDesc) {
     var layerDesc;
     var keyList = keyString.split('.');
 
-    if ((typeof(layerDesc) == 'undefined') || (layerDesc == null)) {
+    if (typeof(layerDesc) == 'undefined' || layerDesc == null) {
         // Cache the IDs, because some (e.g., Text) take a while to get.
         if (typeof this.descCache[keyList[0]] == 'undefined') {
             var ref = new ActionReference();
@@ -56,8 +56,7 @@ PSLayerInfo.prototype.getLayerAttr = function (keyString, layerDesc) {
             ref.putIndex(classLayer, this.index);
             layerDesc = executeActionGet(ref);
             this.descCache[keyList[0]] = layerDesc;
-        }
-        else
+        } else
             layerDesc = this.descCache[keyList[0]];
     }
 

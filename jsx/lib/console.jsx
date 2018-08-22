@@ -21,8 +21,8 @@ function dispatch(type, data) {
 function log(type) {
     return function () {
         var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
+        for (var i = 0; i < arguments.length; i++) {
+            args.push(arguments[i])
         }
         var safeArgs = args.map(function (arg) {
             try {

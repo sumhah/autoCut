@@ -5,9 +5,7 @@
  * 如果子类构造函数里没有初始化变量，就会修改父类里的静态变量
  * 如果子类定义了静态变量，而构造函数里没有，则会修改子类上的静态变量
  */
-var Class;
 var run_flag = true;
-
 
 function constructor(init) {
     return function () {
@@ -23,51 +21,47 @@ function toString(str) {
     };
 }
 
-
-Class = function (base, member) {
+var Class = function (base, member) {
     if (!member) {
         member = base;
         base = null;
     }
 
-
-    var S = member.Static;
+    var staticMembers = member.Static;
     var proto = member;
-    var F, k;
-
+    var constructorFunction, key;
 
     if (base) {
         run_flag = false;
         proto = new base;
         run_flag = true;
 
-        for (k in member) {
-            if (member.hasOwnProperty(k)) {
-                proto[k] = member[k];
+        for (key in member) {
+            if (member.hasOwnProperty(key)) {
+                proto[key] = member[key];
             }
         }
     }
 
-    //
-    // 约定第一个function作为构造函数
-    //
-    for (k in member) {
-        if (typeof member[k] === 'function') {
+    for (key in member) {
+        if (typeof member[key] === 'function') {
             break;
         }
     }
 
-    F = constructor(member[k]);
+    constructorFunction = constructor(member[key]);
 
-    proto.constructor = F;
-    F.prototype = proto;
-    F.toString = toString('[class ' + k + ']');
+    proto.constructor = constructorFunction;
+    constructorFunction.prototype = proto;
+    constructorFunction.toString = toString('[class ' + key + ']');
 
-    for (k in S) {
-        if (S.hasOwnProperty(k)) {
-            F[k] = S[k];
+    if (staticMembers) {
+        for (key in staticMembers) {
+            if (staticMembers.hasOwnProperty(key)) {
+                constructorFunction[key] = staticMembers[key];
+            }
         }
     }
 
-    return F;
+    return constructorFunction;
 };

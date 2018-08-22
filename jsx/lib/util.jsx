@@ -142,3 +142,10 @@ function exportLayer(layer) {
 function id(string) {
     return app.stringIDToTypeID(string)
 }
+
+function makeID(keyStr) {
+    if (keyStr[0] == "'")	// Keys with single quotes 'ABCD' are charIDs.
+        return app.charIDToTypeID(eval(keyStr));
+    else
+        return app.stringIDToTypeID(keyStr);
+}
