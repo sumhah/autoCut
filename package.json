@@ -1,11 +1,45 @@
 {
-  "name": "前端辅助工具",
+  "name": "autoCut",
   "version": "0.0.1",
-  "devDependencies": {},
+  "main": "index.js",
+  "author": "lbl",
+  "license": "ISC",
+  "scripts": {
+    "start": "webpack-dev-server",
+    "build": "webpack"
+  },
+  "devDependencies": {
+    "autoprefixer": "^7.1.1",
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-es2017": "^6.24.1",
+    "babel-preset-es2018": "^1.0.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "css-loader": "^0.28.4",
+    "json-loader": "^0.5.4",
+    "node-sass": "^4.5.3",
+    "postcss-loader": "^2.0.5",
+    "psd": "^3.2.0",
+    "sass-loader": "^6.0.5",
+    "style-loader": "^0.18.1",
+    "webpack": "^2.6.1",
+    "webpack-dev-server": "^2.4.5"
+  },
   "dependencies": {
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015-loose": "^8.0.0",
+    "babel-preset-es2017": "^6.24.1",
     "colors": "^1.1.2",
     "css2json": "0.0.4",
     "express": "^4.16.2",
-    "get-pixels": "^3.3.0"
+    "fs": "0.0.1-security",
+    "get-pixels": "^3.3.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.1",
+    "webpack": "^2.6.1"
   }
 }

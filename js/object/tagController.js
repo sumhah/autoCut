@@ -4,6 +4,7 @@
 require('../setting');
 require('../util/expand');
 const Tag = require('./tag');
+console.log(2);
 
 class TagController {
     constructor(cssInfoArr) {

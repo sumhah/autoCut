@@ -1,37 +1,36 @@
 var Layer = {
+    ref: null,
+    desc: null,
+    layerCount: 0,
+    selectionIndex: 0,
+    currentGroup: null,
+    selected: 0,
+    visibleInGroup: [true],
+    
+    
     layers: [],
+    visibleLayers: [],
+    selectedLayers: [],
     groups: [],
+    allLayers: [],
     taggedLayers: [],
     untaggedLayers: [],
     uniqueTaggedLayers: [],
+    str: '',
 
     init: function () {
         this.reset();
 
-        var collect = this.collectLayers();
-        this.layers = collect.layers.concat(collect.groups);
-        this.groups = collect.groups;
-
-        this.layers.forEach(function (item) {
-            if (/[\w\W]+@$/.test(item.layer.name)) {
-                Layer.taggedLayers.push(item);
-            } else {
-                Layer.untaggedLayers.push(item);
-            }
-        });
-
-        this.taggedLayers.sort(function (item1, item2) {
-            var b1 = item1.layer.bounds;
-            var b2 = item2.layer.bounds;
-            var w1 = b1[2] - b1[0];
-            var w2 = b2[2] - b2[0];
-            var h1 = b1[3] - b1[1];
-            var h2 = b2[3] - b2[1];
-            return w1 * h1 - w2 * h2;
-        });
-        this.uniqueTaggedLayers = this.getUniqueLayer();
-
-        // this.hideAllLayer();
+        this.collectLayers()
+        this.layers.forEach(function (layer) {
+            console.log(layer.layer.name);
+        })
+        this.groups.forEach(function (g) {
+            console.log(g.layer.name);
+            g.children.forEach(function (i) {
+                console.log(i.layer.name);
+            })
+        })
     },
 
     reset: function () {
@@ -42,188 +41,196 @@ var Layer = {
         this.uniqueTaggedLayers = [];
     },
 
-    collectLayers: function (progressBarWindow) {
+    exportCurrentPage: function () {
+        this.reset();
 
-        function isAdjustmentLayer(layer) {
-            switch (layer.kind) {
+        var collect = this.collectLayers();
+        this.layers = collect.layers.concat(collect.groups);
+        this.groups = collect.groups;
 
-                case LayerKind.BRIGHTNESSCONTRAST:
-                case LayerKind.CHANNELMIXER:
-                case LayerKind.COLORBALANCE:
-                case LayerKind.CURVES:
-                case LayerKind.GRADIENTMAP:
-                case LayerKind.HUESATURATION:
-                case LayerKind.INVERSION:
-                case LayerKind.LEVELS:
-                case LayerKind.POSTERIZE:
-                case LayerKind.SELECTIVECOLOR:
-                case LayerKind.THRESHOLD:
-                    return true;
+        var doc = app.activeDocument;
 
-                default:
-                    return false;
-            }
+        doc.crop([
+                UnitValue(0, 'px'),
+                UnitValue(88, 'px'),
+                UnitValue(doc.width, 'px'),
+                UnitValue(doc.height, 'px'),
+            ],
+        );
 
-        }
-
-        var layers = [],
-            visibleLayers = [],
-            selectedLayers = [],
-            groups = [];
-        var layerCount = 0;
-
-        var ref = null;
-        var desc = null;
-
-        var idOrdn = app.charIDToTypeID('Ordn');
-
-        // Get layer count reported by the active Document object - it never includes the background.
-        ref = new ActionReference();
-        ref.putEnumerated(app.charIDToTypeID('Dcmn'), app.charIDToTypeID('Ordn'), app.charIDToTypeID('Trgt'));
-        desc = app.executeActionGet(ref);
-        layerCount = desc.getInteger(app.charIDToTypeID('NmbL'));
-
-        if (layerCount == 0) {
-            // This is a flattened image that contains only the background (which is always visible).
-            var bg = app.activeDocument.backgroundLayer;
-            var layer = {layer: bg, parent: null};
-            layers.push(layer);
-            visibleLayers.push(layer);
-        }
-        else {
-            // There are more layers that may or may not contain a background. The background is always at 0;
-            // other layers are indexed from 1.
-
-            var idLyr = app.charIDToTypeID('Lyr ');
-            var idLayerSection = app.stringIDToTypeID('layerSection');
-            var idVsbl = app.charIDToTypeID('Vsbl');
-            var idNull = app.charIDToTypeID('null');
-            var idSlct = app.charIDToTypeID('slct');
-            var idMkVs = app.charIDToTypeID('MkVs');
-
-            var FEW_LAYERS = 10;
-
-            // newer PS's freeze or crash on Mac OS X Yosemite
-            //if (layerCount <= FEW_LAYERS) {
-            // don't show the progress bar UI for only a few layers
-            //progressBarWindow = null;
-            //}
-
-            if (progressBarWindow) {
-                // The layer count is actually + 1 if there's a background present, but it should be no biggie.
-                showProgressBar(progressBarWindow, 'Collecting layers... Might take up to several seconds.', (layerCount + FEW_LAYERS) / FEW_LAYERS);
-            }
-
-            // Query current selection.
-            ref = new ActionReference();
-            ref.putEnumerated(idLyr, idOrdn, app.charIDToTypeID('Trgt'));
-            var selectionDesc = app.executeActionGet(ref);
-            var selectionIdx = selectionDesc.getInteger(app.charIDToTypeID('ItmI'));
+        var arr = [];
+        var name = doc.name.replace('.psd', '');
+        var str = name + ': (\n';
+        this.layers.forEach(function (item, i) {
+            var curLayer = item.layer;
+            var groupLayer;
 
             try {
-                // Collect normal layers.
-                var visibleInGroup = [true];
-                var layerVisible;
-                var currentGroup = null;
-                var layerSection;
-                var selected = 0;
-                for (var i = layerCount; i >= 1; --i) {
-                    // check if it's an art layer (not a group) that can be selected
-                    ref = new ActionReference();
-                    ref.putIndex(idLyr, i);
-                    desc = app.executeActionGet(ref);
-                    layerVisible = desc.getBoolean(idVsbl);
-                    layerSection = app.typeIDToStringID(desc.getEnumerationValue(idLayerSection));
-                    if ((layerSection == 'layerSectionContent')
-                        || (layerSection == 'layerSectionStart')) {
-                        // select the layer and then retrieve it via Document.activeLayer
-                        desc.clear();
-                        desc.putReference(idNull, ref);
-                        desc.putBoolean(idMkVs, false);
-                        app.executeAction(idSlct, desc, DialogModes.NO);
+                if (curLayer.typename === 'LayerSet') {
+                    if (curLayer.name === '查看范例') {
+                        makeLayerVisible(item);
 
-                        var activeLayer = app.activeDocument.activeLayer;
-
-                        if (layerSection == 'layerSectionContent') {
-                            if (!isAdjustmentLayer(activeLayer)) {
-                                var layer = {layer: activeLayer, parent: currentGroup};
-                                layers.push(layer);
-                                if (layerVisible && visibleInGroup[visibleInGroup.length - 1]) {
-                                    visibleLayers.push(layer);
-                                }
-                                if (selected > 0) {
-                                    selectedLayers.push(layer);
-                                }
-                                if (currentGroup) {
-                                    currentGroup.children.push(layer);
-                                }
-                            }
+                        if (curLayer.layers.length > 0) {
+                            groupLayer = curLayer.merge();
+                            arr.push(parseInt(groupLayer.bounds[1].asCSS()));
+                            groupLayer.remove();
                         }
-                        else {
-                            var group = {layer: activeLayer, parent: currentGroup, children: []};
-                            group.visible = (layerVisible && visibleInGroup[visibleInGroup.length - 1]);
-                            groups.push(group);
-                            if (group.parent) {
-                                group.parent.children.push(group);
-                            }
-                            currentGroup = group;
-                            visibleInGroup.push(group.visible);
-                            // Only check for selected groups. In CS2, 1 and only 1 layer/group is always selected (active).
-                            // It is useless to export just 1 art layer, so only layer groups (sets) are supported.
-                            if ((selectionIdx == i) || (selected > 0)) {
-                                selected++;
-                                group.selected = true;
-                            }
-                        }
-                    }
-                    else if (layerSection == 'layerSectionEnd') {
-                        currentGroup = currentGroup.parent;
-                        visibleInGroup.pop();
-                        if (selected > 0) {
-                            selected--;
-                        }
-                    }
-
-                    if (progressBarWindow && ((i % FEW_LAYERS == 0) || (i == layerCount))) {
-                        updateProgressBar(progressBarWindow);
-                        repaintProgressBar(progressBarWindow);
-                        if (userCancelled) {
-                            throw new Error('cancel');
-                        }
+                    } else if (curLayer.name === '封面突出食物 主题明确 拷贝 2' || curLayer.name === '组 82' || curLayer.name === '热门攻略' || curLayer.name === '底标') {
+                        groupLayer = curLayer.merge();
+                        groupLayer.remove();
                     }
                 }
+            } catch (e) {
+                console.log(e);
+            }
+        });
+        arr.sort(function (num1, num2) {
+            return num1 - num2;
+        }).forEach(function (item, i) {
+            str += (i + 1) + ': ' + item + ',\n';
+        });
+        str += '),\n';
+        this.str += str;
+        Controller.exportImage(name);
+    },
 
-                // Collect the background.
-                ref = new ActionReference();
-                ref.putIndex(idLyr, 0);
-                try {
-                    desc = app.executeActionGet(ref);
-                    var bg = app.activeDocument.backgroundLayer;
-                    var layer = {layer: bg, parent: null};
-                    layers.push(layer);
-                    if (bg.visible) {
-                        visibleLayers.push(layer);
+    collectLayers: function () {
+        this.ref = new ActionReference();
+        this.ref.putEnumerated(id('document'), id('ordinal'), id('targetEnum'));
+        this.desc = app.executeActionGet(this.ref);
+        this.layerCount = this.desc.getInteger(id('numberOfLayers'));
+
+        if (this.layerCount === 0) {
+            // This is a flattened image that contains only the background (which is always visible).
+            this.collectWhenLayerCountIsZero();
+        } else {
+            // There are more layers that may or may not contain a background. The background is always at 0;
+            // other layers are indexed from 1.
+            this.collectWhenLayerCountIsNotZero();
+        }
+    },
+
+    isAdjustmentLayer: function (layer) {
+        switch (layer.kind) {
+            case LayerKind.BRIGHTNESSCONTRAST:
+            case LayerKind.CHANNELMIXER:
+            case LayerKind.COLORBALANCE:
+            case LayerKind.CURVES:
+            case LayerKind.GRADIENTMAP:
+            case LayerKind.HUESATURATION:
+            case LayerKind.INVERSION:
+            case LayerKind.LEVELS:
+            case LayerKind.POSTERIZE:
+            case LayerKind.SELECTIVECOLOR:
+            case LayerKind.THRESHOLD:
+                return true;
+            default:
+                return false;
+        }
+    },
+
+    collectWhenLayerCountIsZero: function () {
+        var layer = {
+            layer: app.activeDocument.backgroundLayer,
+            parent: null
+        };
+        this.layers.push(layer);
+        this.visibleLayers.push(layer);
+    },
+
+    collectWhenLayerCountIsNotZero: function () {
+        // Query current selection.
+        this.ref = new ActionReference();
+        this.ref.putEnumerated(id('layer'), id('ordinal'), id('targetEnum'));
+        this.selectionIndex = app.executeActionGet(this.ref).getInteger(id('itemIndex'));
+        this.collectNormalLayers();
+        this.collectBackgroundLayer();
+    },
+
+    collectNormalLayers: function () {
+        for (var i = this.layerCount; i >= 1; --i) {
+            // check if it's an art layer (not a group) that can be this.selected
+            this.collectOneLayer(i);
+            processWindow.update(this.layerCount - i + 1, this.layerCount, 'traverse layer');
+        }
+    },
+
+    collectOneLayer: function (i) {
+        // equal layers[i].visible    .section
+        this.ref = new ActionReference();
+        this.ref.putIndex(id('layer'), i);
+        this.desc = app.executeActionGet(this.ref);
+        var layerVisible = this.desc.getBoolean(id('visible'));
+        var layerSection = app.typeIDToStringID(this.desc.getEnumerationValue(id('layerSection')));
+        if (layerSection === 'layerSectionContent' || layerSection === 'layerSectionStart') {
+            // select the layer and then retrieve it via Document.activeLayer
+            this.desc.clear();
+            this.desc.putReference(id('null'), this.ref);
+            this.desc.putBoolean(id('makeVisible'), false);
+            app.executeAction(id('select'), this.desc, DialogModes.NO);
+
+            var activeLayer = app.activeDocument.activeLayer;
+
+            if (layerSection == 'layerSectionContent') {
+                if (!this.isAdjustmentLayer(activeLayer)) {
+                    var layer = {
+                        layer: activeLayer,
+                        parent: this.currentGroup
+                    };
+                    this.layers.push(layer);
+                    if (layerVisible && this.visibleInGroup[this.visibleInGroup.length - 1]) {
+                        this.visibleLayers.push(layer);
                     }
-
-                    if (progressBarWindow) {
-                        updateProgressBar(progressBarWindow);
-                        repaintProgressBar(progressBarWindow);
+                    if (this.selected > 0) {
+                        this.selectedLayers.push(layer);
+                    }
+                    if (this.currentGroup) {
+                        this.currentGroup.children.push(layer);
                     }
                 }
-                catch (e) {
-                    // no background, move on
+            } else {
+                var group = {
+                    layer: activeLayer,
+                    parent: this.currentGroup,
+                    children: []
+                };
+                group.visible = layerVisible && this.visibleInGroup[this.visibleInGroup.length - 1];
+                this.groups.push(group);
+                if (group.parent) {
+                    group.parent.children.push(group);
+                }
+                this.currentGroup = group;
+                this.visibleInGroup.push(group.visible);
+                // Only check for this.selected groups. In CS2, 1 and only 1 layer/group is always this.selected (active).
+                // It is useless to export just 1 art layer, so only layer groups (sets) are supported.
+                if (this.selectionIndex === i || this.selected > 0) {
+                    this.selected;
+                    group.selected = true;
                 }
             }
-            catch (e) {
-                if (e.message != 'cancel') throw e;
-            }
-
-            if (progressBarWindow) {
-                progressBarWindow.hide();
+        } else if (layerSection == 'layerSectionEnd') {
+            this.currentGroup = this.currentGroup.parent;
+            this.visibleInGroup.pop();
+            if (this.selected > 0) {
+                this.selected -= 1;
             }
         }
+    },
 
-        return {layers: layers, visibleLayers: visibleLayers, selectedLayers: selectedLayers, groups: groups};
+    collectBackgroundLayer: function () {
+        this.ref = new ActionReference();
+        this.ref.putIndex(id('layer'), 0);
+        try {
+            this.desc = app.executeActionGet(this.ref);
+            var bg = app.activeDocument.backgroundLayer;
+            var layer = {layer: bg, parent: null};
+            this.layers.push(layer);
+            if (bg.visible) {
+                this.visibleLayers.push(layer);
+            }
+        } catch (e) {
+            // no background, move on
+        }
     },
 
     getLayerCss: function (layer) {
@@ -240,8 +247,8 @@ var Layer = {
         var uniqueLayers = [];
         this.taggedLayers.forEach(function (item) {
             if (uniqueLayers.every(function (uniqueItem) {
-                    return uniqueItem.layer.name !== item.layer.name;
-                })) {
+                return uniqueItem.layer.name !== item.layer.name;
+            })) {
                 uniqueLayers.push(item);
             }
         });

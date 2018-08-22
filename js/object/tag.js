@@ -71,16 +71,12 @@ class Tag extends Box {
 
         // 1.文本类型css继承, ------暂未使用
         // 如果已从父元素继承相同属性，不再声明某prop，----暂无使用
-        this.parents.forEach(item => {
-            INHERITABLE_PROP.forEach((prop) => {
-                this._inheritPropFromParent(item, prop);
-            });
-        });
+        this.parents.forEach(item => INHERITABLE_PROP.forEach(prop => this._inheritPropFromParent(item, prop)));
 
         // 2.搜索siblings里如果有两个相同的可继承属性，去掉子元素的属性，并且加到它的最近父元素上
         // 提取font-size会导致有空白节点，使计算产生偏差，暂时搁置
         // 存在2组重复会导致少的那组属性被删除，暂时搁置
-        // todo sibligns里有2组重复的，取重复最高的组，其他组不上推
+        // todo siblings里有2组重复的，取重复最高的组，其他组不上推
         const redundantProp = [];
         this.siblings.forEach(item => {
             INHERITABLE_PROP.forEach((prop) => {

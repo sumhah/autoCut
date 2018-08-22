@@ -4,15 +4,20 @@ var Controller = {
     cssText: '',
 
     start: function () {
+        processWindow.show();
         this.reset();
         var doc = this.doc;
         this.cssText += '.root {\n    left: 0px;\n    top: 0px;\n    width: ' + parseFloat(doc.width) + 'px;\n    height: ' + parseFloat(doc.height) + 'px;\n}\n\n';
 
         this.createFolder();
+        console.log(2);
         this.eachTaggerLayersToExport();
+        console.log(3);
         this.exportRootDocument();
+        console.log(4);
         this.exportCssFile();
 
+        processWindow.hide();
         alert('Done!');
     },
 
@@ -27,9 +32,9 @@ var Controller = {
         if (!folder.exists) {
             folder.create();
         }
-        each(folder.getFiles(), function (file) {
-            file.remove();
-        });
+        // each(folder.getFiles(), function (file) {
+        //     file.remove();
+        // });
         this.folder = folder;
     },
 
@@ -75,16 +80,16 @@ var Controller = {
             write_file = new File(cssFilePath);
         }
 
-        var out;
         if (write_file !== '') {
             //Open the file for writing.
-            out = write_file.open('w', undefined, undefined);
+            var out = write_file.open('w', undefined, undefined);
             write_file.encoding = 'UTF-8';
             write_file.lineFeed = 'Macintosh';
-        }
-        if (out) {
-            write_file.write(this.cssText);
-            write_file.close();
+
+            if (out) {
+                write_file.write(this.cssText);
+                write_file.close();
+            }
         }
     },
 
@@ -93,16 +98,16 @@ var Controller = {
     },
 
     exportImage: function (fileName) {
-        var doc = this.doc;
-
+        var doc = app.activeDocument;
         var exportOptions = new ExportOptionsSaveForWeb();
         exportOptions.PNG8 = false;
         exportOptions.format = SaveDocumentType.PNG;
         exportOptions.transparency = true;
         exportOptions.interlaced = false;
         exportOptions.quality = 100;
-        var filePath = sourcePath + fileName + '.png';
-        var fileOut = new File(filePath);
+        var fileOut = new File(sourcePath + fileName + '.png');
         doc.exportDocument(fileOut, ExportType.SAVEFORWEB, exportOptions);
     },
 };
+
+console.log('controller run');

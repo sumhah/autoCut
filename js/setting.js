@@ -99,7 +99,7 @@ global.PAGE_WIDTH_TO_REM_RATIO = BASE_PAGE_WIDTH / ROOT_FONT_SIZE;
  * default: 默认模式，智能判断什么时候该使用绝对定位或标准布局
  * @type {string}
  */
-global.MODE = 'absolute';
+global.MODE = '';
 
 // 输出的页面文件名
 global.PAGE_NAME = 'index';

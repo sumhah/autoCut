@@ -1,5 +1,6 @@
 body {
-    background-color: #a2a1a3;
+    background-color: #535353;
+    color: #d6d6d6;
 }
 
 h1 {
@@ -20,6 +21,12 @@ p {
     color: #fff;
     border-radius: .3em;
     background-color: #bcbfc1;
+}
+
+.css {
+    padding: 10px;
+    color: #ffea7d;
+    background-color: #2c323c;
 }
 
 .tip-text {
