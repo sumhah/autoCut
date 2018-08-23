@@ -20,22 +20,23 @@ var Layer = {
 
     init: function () {
         this.reset();
-
         this.collectLayers()
-        this.layers.forEach(function (layer) {
-            console.log(layer.layer.name);
+        this.allLayers = this.layers.concat(this.groups);
+        this.taggedLayers = this.allLayers.filter(function (item, i, array) {
+            processWindow.update(i, array.length - 1, 'filter out labeled layers')
+            return /[\w-_]+@[\w-_]*/.test(item.layer.name)
         })
-        this.groups.forEach(function (g) {
-            console.log(g.layer.name);
-            g.children.forEach(function (i) {
-                console.log(i.layer.name);
-            })
-        })
+        this.uniqueTaggedLayers = this.getUniqueLayer()
+        console.log(this.uniqueTaggedLayers.length);
     },
 
     reset: function () {
         this.layers = [];
         this.groups = [];
+        this.visibleLayers = [];
+        this.selectedLayers = [];
+        this.groups = [];
+        this.allLayers = [];
         this.taggedLayers = [];
         this.untaggedLayers = [];
         this.uniqueTaggedLayers = [];
@@ -150,6 +151,9 @@ var Layer = {
     collectNormalLayers: function () {
         for (var i = this.layerCount; i >= 1; --i) {
             // check if it's an art layer (not a group) that can be this.selected
+            if (processWindow.userCancelled) {
+                return;
+            }
             this.collectOneLayer(i);
             processWindow.update(this.layerCount - i + 1, this.layerCount, 'traverse layer');
         }

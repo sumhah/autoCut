@@ -8,15 +8,10 @@ var Controller = {
         this.reset();
         var doc = this.doc;
         this.cssText += '.root {\n    left: 0px;\n    top: 0px;\n    width: ' + parseFloat(doc.width) + 'px;\n    height: ' + parseFloat(doc.height) + 'px;\n}\n\n';
-
         this.createFolder();
-        console.log(2);
         this.eachTaggerLayersToExport();
-        console.log(3);
         this.exportRootDocument();
-        console.log(4);
         this.exportCssFile();
-
         processWindow.hide();
         alert('Done!');
     },
@@ -32,9 +27,9 @@ var Controller = {
         if (!folder.exists) {
             folder.create();
         }
-        // each(folder.getFiles(), function (file) {
-        //     file.remove();
-        // });
+        each(folder.getFiles(), function (file) {
+            file.remove();
+        });
         this.folder = folder;
     },
 
@@ -42,33 +37,22 @@ var Controller = {
         try {
             var self = this;
             var Layer = this.Layer;
-            this.Layer.uniqueTaggedLayers.forEach(function (item) {
-                console.log(item.layer.name);
-            });
-            this.Layer.uniqueTaggedLayers.forEach(function (item) {
-                makeLayerVisible(item);
-                var groupLayer, curLayer = item.layer;
-
-                console.log(item.layer.name);
-
-                if (curLayer.typename === 'LayerSet') {
-                    groupLayer = curLayer.merge();
+            this.Layer.uniqueTaggedLayers.forEach(function (item, i, array) {
+                if (processWindow.userCancelled) {
+                    return;
                 }
-
-                if (groupLayer) {
-                    self.cssText += Layer.getLayerCss(groupLayer) + '\n';
-                    groupLayer.remove();
-                    // makeLayerHide(item);
-                } else {
-                    self.cssText += Layer.getLayerCss(curLayer) + '\n';
-                    // makeLayerHide(item);
-                    curLayer.remove();
+                processWindow.update(i + 1, array.length, 'export layer ' + item.layer.name)
+                console.log('导出第' + i + '个', item.layer.name);
+                self.doc.activeLayer = item.layer;
+                try {
+                    var css = new CSS(item.layer);
+                } catch (e) {
+                    console.error(e);
                 }
-
             });
         }
         catch (e) {
-            console.log(e.message);
+            console.error(e.message);
         }
     },
 
@@ -98,16 +82,6 @@ var Controller = {
     },
 
     exportImage: function (fileName) {
-        var doc = app.activeDocument;
-        var exportOptions = new ExportOptionsSaveForWeb();
-        exportOptions.PNG8 = false;
-        exportOptions.format = SaveDocumentType.PNG;
-        exportOptions.transparency = true;
-        exportOptions.interlaced = false;
-        exportOptions.quality = 100;
-        var fileOut = new File(sourcePath + fileName + '.png');
-        doc.exportDocument(fileOut, ExportType.SAVEFORWEB, exportOptions);
+        this.doc.exportDocument(new File(sourcePath + fileName + '.png'), ExportType.SAVEFORWEB, AUTO_CUT_EXPORT_OPTION);
     },
 };
-
-console.log('controller run');

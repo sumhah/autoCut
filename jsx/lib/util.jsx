@@ -149,3 +149,10 @@ function makeID(keyStr) {
     else
         return app.stringIDToTypeID(keyStr);
 }
+
+const AUTO_CUT_EXPORT_OPTION = new ExportOptionsSaveForWeb();
+AUTO_CUT_EXPORT_OPTION.PNG8 = false;
+AUTO_CUT_EXPORT_OPTION.format = SaveDocumentType.PNG;
+AUTO_CUT_EXPORT_OPTION.transparency = true;
+AUTO_CUT_EXPORT_OPTION.interlaced = false;
+AUTO_CUT_EXPORT_OPTION.quality = 100;

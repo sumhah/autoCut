@@ -77,8 +77,8 @@ class AutoCut {
         window.localStorage.debug = '*';
         this.addConsoleSupport();
         this.load();
-        this.bindEvent();
         this.addClickMethods();
+        this.bindEvent();
     }
 
     static load() {
@@ -112,20 +112,22 @@ class AutoCut {
     }
 
     static bindLayerSelectEvent() {
-        const cs = this.csInterface;
-        const event = new CSEvent('com.adobe.PhotoshopRegisterEvent', 'APPLICATION');
-        event.extensionId = cs.getExtensionID();
-        event.data = '1936483188';
-        cs.dispatchEvent(event);
+        try {
+            const cs = this.csInterface;
+            const event = new CSEvent('com.adobe.PhotoshopRegisterEvent', 'APPLICATION');
+            event.extensionId = cs.getExtensionID();
+            event.data = '1936483188';
+            cs.dispatchEvent(event);
+
+            cs.addEventListener('com.adobe.PhotoshopJSONCallback' + cs.getExtensionID(), this.layerSelectHandler.bind(this));
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     static layerSelectHandler() {
-        this.csInterface.evalScript('getLayerCss()', result => {
-            console.log(result);
-            const css = cssParser.parse(result);
-            console.log(css);
-            this.cssDom.innerHTML = css;
-        });
+        return;
+        this.csInterface.evalScript('selectLayer()', result => {});
     }
 
     static loadJsx(fileName) {

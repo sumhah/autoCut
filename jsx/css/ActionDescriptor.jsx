@@ -1,8 +1,3 @@
-/**
- * Created by sumhah on 18/1/15.
- */
-
-
 //////////////////////////////////// ActionDescriptor //////////////////////////////////////
 
 ActionDescriptor.prototype.getFlatType = function (ID) {
@@ -27,7 +22,7 @@ ActionDescriptor.prototype.getVal = function (keyList, firstListItemOnly) {
     if (typeof(keyList) == 'string')	// Make keyList an array if not already
         keyList = keyList.split('.');
 
-    if (typeof( firstListItemOnly ) == 'undefined')
+    if (typeof(firstListItemOnly) == 'undefined')
         firstListItemOnly = true;
 
     // If there are no more keys to traverse, just return this object.
@@ -42,8 +37,8 @@ ActionDescriptor.prototype.getVal = function (keyList, firstListItemOnly) {
             case DescValueType.OBJECTTYPE:
                 return this.getObjectValue(keyID).getVal(keyList, firstListItemOnly);
             case DescValueType.LISTTYPE:
-                var xx = this.getList(keyID);  // THIS IS CREEPY - original code below fails in random places on the same document.
-                return /*this.getList( keyID )*/xx.getVal(keyList, firstListItemOnly);
+                // THIS IS CREEPY - original code below fails in random places on the same document.
+                return /*this.getList( keyID )*/this.getList(keyID).getVal(keyList, firstListItemOnly);
             default:
                 return this.getFlatType(keyID);
         }
@@ -56,7 +51,7 @@ ActionList.prototype.getVal = function (keyList, firstListItemOnly) {
     if (typeof(keyList) == 'string')	// Make keyList an array if not already
         keyList = keyList.split('.');
 
-    if (typeof( firstListItemOnly ) == 'undefined')
+    if (typeof(firstListItemOnly) == 'undefined')
         firstListItemOnly = true;
 
     // Instead of ID, pass list item #.  Duck typing.
@@ -101,15 +96,48 @@ ActionDescriptor.dumpValue = function (flatValue) {
         return flatValue;
 };
 
+function echoSpace(num) {
+    var str = '';
+    for (var i = 0; i < num; i += 1) {
+        str += ' ';
+    }
+    return str;
+}
+
+ActionDescriptor.prototype.dumpAllKey = function (indent) {
+    var obj = {};
+
+    for (var i = 0; i < this.count; i += 1) {
+        console.log(echoSpace(indent) + 'current: ', i + '/' + this.count);
+        try {
+            console.log(this, this instanceof ActionDescriptor);
+            var typeID = this.getKey(i);
+            console.log(echoSpace(indent) + 'typeID', typeID);
+            var key = app.typeIDToStringID(typeID);
+            var childDesc = this.getVal(key);
+            console.log(echoSpace(indent) + key + ':', childDesc);
+            if (childDesc instanceof ActionDescriptor) {
+                obj[key] = childDesc.dumpAllKey(indent + 8);
+            } else {
+                obj[key] = childDesc;
+            }
+        } catch (e) {
+            console.error(e, obj);
+        }
+    }
+    return obj;
+};
+
 // Debugging - recursively walk a descriptor and dump out all of the keys
 // Note we only dump stringIDs.  If you look in UActions.cpp:CInitialStringToIDEntry,
 // there is a table converting most (all?) charIDs into stringIDs.
 ActionDescriptor.prototype.dumpDesc = function (keyName) {
     var i;
-    if (typeof( keyName ) == 'undefined')
+    if (typeof(keyName) == 'undefined')
         keyName = '';
 
     for (i = 0; i < this.count; ++i) {
+        console.log('current: ', i + '/' + this.count);
         var key = this.getKey(i);
         var ref;
         var thisKey = keyName + '.' + app.typeIDToStringID(key);
@@ -117,30 +145,26 @@ ActionDescriptor.prototype.dumpDesc = function (keyName) {
             case DescValueType.OBJECTTYPE:
                 this.getObjectValue(key).dumpDesc(thisKey);
                 break;
-
             case DescValueType.LISTTYPE:
                 this.getList(key).dumpDesc(thisKey);
                 break;
-
             case DescValueType.REFERENCETYPE:
                 ref = this.getFlatType(key);
-                $.writeln(thisKey + ':ref:' + ref.refclass + ':' + ref.value);
+                console.log(thisKey + ':ref:' + ref.refclass + ':' + ref.value);
                 break;
-
             default:
-                $.writeln(thisKey
-                    + ': ' + ActionDescriptor.dumpValue(this.getFlatType(key)));
+                console.log(thisKey + ': ' + ActionDescriptor.dumpValue(this.getFlatType(key)));
         }
     }
 };
 
 ActionList.prototype.dumpDesc = function (keyName) {
     var i;
-    if (typeof( keyName ) == 'undefined')
+    if (typeof(keyName) == 'undefined')
         keyName = '';
 
     if (this.count == 0)
-        $.writeln(keyName + ' <empty list>');
+        console.log(keyName + ' <empty list>');
     else
         for (i = 0; i < this.count; ++i) {
             try {
@@ -149,11 +173,11 @@ ActionList.prototype.dumpDesc = function (keyName) {
                 else if (this.getType(i) == DescValueType.LISTTYPE)
                     this.getList(i).dumpDesc(keyName + '[' + i + ']');
                 else
-                    $.writeln(keyName + '[' + i + ']:'
+                    console.log(keyName + '[' + i + ']:'
                         + ActionDescriptor.dumpValue(this.getFlatType(i)));
             }
             catch (err) {
-                $.writeln('Error ' + keyName + '[' + i + ']: ' + err.message);
+                console.log('Error ' + keyName + '[' + i + ']: ' + err.message);
             }
         }
 };
