@@ -40,6 +40,8 @@ export default class AutoCut {
         });
         window.test = () => cs.evalScript('test()', (result) => {
         });
+        window.tryMethod = () => cs.evalScript('mergeLayer()', (result) => {
+        });
     }
 
     static addConsoleSupport() {

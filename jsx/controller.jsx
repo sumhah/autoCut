@@ -4,14 +4,24 @@ var Controller = {
     cssText: '',
 
     start: function () {
+        var self = this;
         processWindow.show();
         this.reset();
         var doc = this.doc;
         this.cssText += '.root {\n    left: 0px;\n    top: 0px;\n    width: ' + parseFloat(doc.width) + 'px;\n    height: ' + parseFloat(doc.height) + 'px;\n}\n\n';
-        this.createFolder();
-        this.eachTaggerLayersToExport();
-        this.exportRootDocument();
-        this.exportCssFile();
+
+        countTime('createFolder', function () {
+            self.createFolder();
+        })
+        countTime('eachTaggerLayersToExport', function () {
+            self.eachTaggerLayersToExport();
+        })
+        countTime('bg', function () {
+            self.exportRootDocument();
+        })
+        countTime('exportCssFile', function () {
+            self.exportCssFile();
+        })
         processWindow.hide();
         alert('Done!');
     },
@@ -19,7 +29,11 @@ var Controller = {
     reset: function () {
         this.doc = app.activeDocument;
         this.cssText = '';
-        this.Layer.init();
+
+        var self = this;
+        countTime('layer init', function () {
+            self.Layer.init();
+        })
     },
 
     createFolder: function () {
@@ -42,7 +56,7 @@ var Controller = {
                     return;
                 }
                 processWindow.update(i + 1, array.length, 'export layer ' + item.layer.name)
-                console.log('导出第' + i + '个', item.layer.name);
+                console.log('导出第' + (i + 1) + '个', item.layer.name);
                 self.doc.activeLayer = item.layer;
                 try {
                     var css = new CSS(item.layer);
@@ -78,6 +92,7 @@ var Controller = {
     },
 
     exportRootDocument: function () {
+        flattenCurrentDocument()
         this.exportImage('bg');
     },
 

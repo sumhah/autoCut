@@ -140,11 +140,11 @@ function exportLayer(layer) {
 }
 
 function id(string) {
-    return app.stringIDToTypeID(string)
+    return app.stringIDToTypeID(string);
 }
 
 function makeID(keyStr) {
-    if (keyStr[0] == "'")	// Keys with single quotes 'ABCD' are charIDs.
+    if (keyStr[0] == '\'')	// Keys with single quotes 'ABCD' are charIDs.
         return app.charIDToTypeID(eval(keyStr));
     else
         return app.stringIDToTypeID(keyStr);
@@ -156,3 +156,104 @@ AUTO_CUT_EXPORT_OPTION.format = SaveDocumentType.PNG;
 AUTO_CUT_EXPORT_OPTION.transparency = true;
 AUTO_CUT_EXPORT_OPTION.interlaced = false;
 AUTO_CUT_EXPORT_OPTION.quality = 100;
+
+function cropToCurrentLayer() {
+    // var doc = app.activeDocument
+    // doc.crop(doc.activeLayer.bounds);
+
+    var idCrop = charIDToTypeID('Crop');
+    var desc1711 = new ActionDescriptor();
+    var idT = charIDToTypeID('T   ');
+    var desc1712 = new ActionDescriptor();
+    var idTop = charIDToTypeID('Top ');
+    var idPxl = charIDToTypeID('#Pxl');
+    desc1712.putUnitDouble(idTop, idPxl, -80.000000);
+    var idLeft = charIDToTypeID('Left');
+    var idPxl = charIDToTypeID('#Pxl');
+    desc1712.putUnitDouble(idLeft, idPxl, 594.000000);
+    var idBtom = charIDToTypeID('Btom');
+    var idPxl = charIDToTypeID('#Pxl');
+    desc1712.putUnitDouble(idBtom, idPxl, 91.000000);
+    var idRght = charIDToTypeID('Rght');
+    var idPxl = charIDToTypeID('#Pxl');
+    desc1712.putUnitDouble(idRght, idPxl, 720.000000);
+    var idRctn = charIDToTypeID('Rctn');
+    desc1711.putObject(idT, idRctn, desc1712);
+    var idAngl = charIDToTypeID('Angl');
+    var idAng = charIDToTypeID('#Ang');
+    desc1711.putUnitDouble(idAngl, idAng, 0.000000);
+    var idDlt = charIDToTypeID('Dlt ');
+    desc1711.putBoolean(idDlt, true);
+    var idcropAspectRatioModeKey = stringIDToTypeID('cropAspectRatioModeKey');
+    var idcropAspectRatioModeClass = stringIDToTypeID('cropAspectRatioModeClass');
+    var idpureAspectRatio = stringIDToTypeID('pureAspectRatio');
+    desc1711.putEnumerated(idcropAspectRatioModeKey, idcropAspectRatioModeClass, idpureAspectRatio);
+    var idCnsP = charIDToTypeID('CnsP');
+    desc1711.putBoolean(idCnsP, false);
+    executeAction(idCrop, desc1711, DialogModes.NO);
+}
+
+function newDocFromLayer() {
+    var docName = 'document';
+    var layerName = 'layer';
+    var desc = new ActionDescriptor();
+    var ref = new ActionReference();
+    ref.putClass(charIDToTypeID('Dcmn'));
+    desc.putReference(charIDToTypeID('null'), ref);
+    desc.putString(charIDToTypeID('Nm  '), docName);
+    var ref1 = new ActionReference();
+    ref1.putEnumerated(charIDToTypeID('Lyr '), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
+    desc.putReference(charIDToTypeID('Usng'), ref1);
+    desc.putString(charIDToTypeID('LyrN'), layerName);
+    executeAction(charIDToTypeID('Mk  '), desc, DialogModes.NO);
+}
+
+function exportPng24AM(file) {
+
+    var WHITE = new RGBColor();
+    WHITE.red = 255;
+    WHITE.green = 255;
+    WHITE.blue = 255;
+
+    var desc = new ActionDescriptor(),
+        desc2 = new ActionDescriptor();
+    desc2.putEnumerated(app.charIDToTypeID('Op  '), app.charIDToTypeID('SWOp'), app.charIDToTypeID('OpSa'));
+    desc2.putEnumerated(app.charIDToTypeID('Fmt '), app.charIDToTypeID('IRFm'), app.charIDToTypeID('PN24'));
+    desc2.putBoolean(app.charIDToTypeID('Intr'), false);
+    desc2.putBoolean(app.charIDToTypeID('Trns'), true);
+    desc2.putBoolean(app.charIDToTypeID('Mtt '), true);
+    desc2.putInteger(app.charIDToTypeID('MttR'), WHITE.red);
+    desc2.putInteger(app.charIDToTypeID('MttG'), WHITE.green);
+    desc2.putInteger(app.charIDToTypeID('MttB'), WHITE.blue);
+    desc2.putBoolean(app.charIDToTypeID('SHTM'), false);
+    desc2.putBoolean(app.charIDToTypeID('SImg'), true);
+    desc2.putBoolean(app.charIDToTypeID('SSSO'), false);
+    desc2.putList(app.charIDToTypeID('SSLt'), new ActionList());
+    desc2.putBoolean(app.charIDToTypeID('DIDr'), false);
+    desc2.putPath(app.charIDToTypeID('In  '), file);
+    desc.putObject(app.charIDToTypeID('Usng'), app.stringIDToTypeID('SaveForWeb'), desc2);
+    app.executeAction(app.charIDToTypeID('Expr'), desc, DialogModes.NO);
+}
+
+function countTime(name, fn, count) {
+    var t = new Date();
+    count = count || 1;
+    for (var i = 0; i < count; i += 1) {
+        fn();
+    }
+    console.log(name + ': ', new Date() - t + 'ms');
+}
+
+function quickExportAsPng() {
+    var desc = new ActionDescriptor();
+    var ref = new ActionReference();
+    ref.putName(id('action'), 'quick');
+    ref.putName(id('actionSet'), 'rank');
+    desc.putReference(id('null'), ref);
+    executeAction(id('play'), desc, DialogModes.NO);
+}
+
+function flattenCurrentDocument() {
+    app.activeDocument.flatten()
+    // executeAction(charIDToTypeID('FltI'), undefined, DialogModes.NO);
+}

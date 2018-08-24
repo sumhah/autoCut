@@ -26,8 +26,13 @@ var Layer = {
             processWindow.update(i, array.length - 1, 'filter out labeled layers')
             return /[\w-_]+@[\w-_]*/.test(item.layer.name)
         })
-        this.uniqueTaggedLayers = this.getUniqueLayer()
-        console.log(this.uniqueTaggedLayers.length);
+        this.uniqueTaggedLayers = this.getUniqueLayer().sort(function (item1, item2) {
+            var bound1 = item1.layer.bounds;
+            var bound2 = item2.layer.bounds;
+            var w1 = bound1bound1[2].value - bound1[0].value
+            return (bound1[2].value - bound1[0].value) - (bound2[2].value - bound2[0].value)
+        })
+        console.log('layers count: ', this.uniqueTaggedLayers.length);
     },
 
     reset: function () {

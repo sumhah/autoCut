@@ -48,3 +48,14 @@ p {
     color: #fff;
     background-color: #bcbfc1;
 }
+
+.try-btn {
+    width: 140px;
+    margin: 0 auto;
+    border: none;
+    border-radius: .3em;
+    font-size: 30px;
+    text-align: center;
+    color: #fff;
+    background-color: #bcbfc1;
+}

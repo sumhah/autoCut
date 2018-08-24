@@ -13,14 +13,6 @@ try {
     const KIND_SolidColorSheet = 11;
     const KIND_BackgroundSheet = 12;
     const KIND_HiddenSectionBounder = 13;
-    var DOCUMENT_INDEX_OFFSET = 0;
-    try {
-        // This throws an error if there's no background
-        if (app.activeDocument.backgroundLayer) {
-            DOCUMENT_INDEX_OFFSET = 1;
-        }
-    }
-    catch (err) {}
 
     var CSS = Class({
         name: 'unknown',
@@ -57,13 +49,20 @@ try {
 
         CSS: function (layer) {
             this.name = layer.name;
+            var DOCUMENT_INDEX_OFFSET = 0;
+            try {
+                // This throws an error if there's no background
+                if (app.activeDocument.backgroundLayer) {
+                    DOCUMENT_INDEX_OFFSET = 1;
+                }
+            } catch (err) {
+            }
             this.index = layer.itemIndex - DOCUMENT_INDEX_OFFSET;
-            console.log('item.index: ', layer.itemIndex);
             this.kind = this.getLayerAttr('layerKind');
             this.id = layer.id;
-            this.showLayer()
+            this.showLayer();
             this.getStyle(layer);
-            this.hideLayer()
+            this.hideLayer();
             console.log(this);
         },
 
@@ -71,20 +70,25 @@ try {
             try {
                 switch (this.kind) {
                     case KIND_PixelSheet:
+                        console.log('PixelSheet 将其导出');
                         this.exportLayer(layer);
                         break;
                     case KIND_TextSheet:
+                        console.log('KIND_TextSheet 获取文字属性');
                         this.getText(layer);
                         break;
                     case KIND_VectorSheet:
+                        console.log('KIND_VectorSheet 获取形状属性');
                         this.getBorder(layer);
                         this.getBackgroundColor();
                         this.getBorderRadius();
                         break;
                     case KIND_LayerGroupSheet:
                         // children > 0  &&  visible = true
+                        console.log('KIND_LayerGroupSheet 合并， 导出');
                         try {
-                            layer = layer.merge();
+                            executeAction(charIDToTypeID('Mrg2'), undefined, DialogModes.NO);
+                            layer = app.activeDocument.activeLayer;
                             this.index = layer.itemIndex;
                             this.id = layer.id;
                             this.exportLayer(layer);
@@ -94,9 +98,10 @@ try {
                         break;
                     case KIND_SmartObjectSheet:
                     default:
+                        console.log('KIND_SmartObjectSheet，栅格化 导出');
                         this.rasterizeLayer();
-                        layer = app.activeDocument.activeLayer
-                        this.exportLayer(layer)
+                        layer = app.activeDocument.activeLayer;
+                        this.exportLayer(layer);
                         break;
                 }
                 this.getBounds(layer);
@@ -124,11 +129,11 @@ try {
         },
 
         hideLayer: function () {
-            this.exec('hide')
+            this.exec('hide');
         },
 
         showLayer: function () {
-            this.exec('show')
+            this.exec('show');
         },
 
         exec: function (action) {
@@ -143,16 +148,25 @@ try {
 
         exportLayer: function (layer) {
             try {
-                var fileOut = new File(sourcePath + this.name + '.png');
-                var bounds = layer.bounds;
-                var w = bounds[2] - bounds[0];
-                var h = bounds[3] - bounds[1];
-                layer.copy();
-                app.documents.add(w, h, 72, 'temp', NewDocumentMode.RGB, DocumentFill.TRANSPARENT, 1);
-                var temp = app.activeDocument;
-                temp.paste();
-                temp.exportDocument(fileOut, ExportType.SAVEFORWEB, AUTO_CUT_EXPORT_OPTION);
-                temp.close(SaveOptions.DONOTSAVECHANGES);
+                var self = this;
+                countTime('export image: ', function () {
+                    var fileOut = new File(sourcePath + self.name + '.png');
+                    var bounds = layer.bounds;
+                    var w = bounds[2] - bounds[0];
+                    var h = bounds[3] - bounds[1];
+
+                    countTime('newDocFromLayer', function () {
+                        newDocFromLayer();
+                    })
+                    countTime('trimCurrentDocument', function () {
+                        trimCurrentDocument();
+                    });
+                    countTime('exportDocument', function () {
+                        var doc = app.activeDocument;
+                        doc.exportDocument(fileOut, ExportType.SAVEFORWEB, AUTO_CUT_EXPORT_OPTION);
+                        doc.close(SaveOptions.DONOTSAVECHANGES);
+                    });
+                });
             } catch (e) {
                 console.error(e.message, e);
             }
@@ -200,35 +214,21 @@ try {
 
         getText: function (layer) {
             try {
-                console.log(1);
                 var textKey = this.getLayerAttr('textKey');
-                console.log(2);
                 var textStyle = this.getLayerAttr('textKey.textStyleRange.textStyle');
-                console.log(3);
                 var paragraphStyle = this.getLayerAttr('textKey.paragraphStyleRange.paragraphStyle');
-                console.log(4);
                 this.color = this.descColorToObj(textStyle.getVal('color'));
-                console.log(5);
                 this.fontSize = parseFloat(textStyle.getVal('impliedFontSize'));
-                console.log(6);
                 this.lineHeight = parseFloat(textStyle.getVal('impliedLeading'));
-                console.log(7);
                 this.letterSpacing = parseFloat(textStyle.getVal('tracking'));
-                console.log(8);
                 this.textAlign = paragraphStyle.getVal('align');
-                console.log(9);
                 this.contents = textKey.getVal('textKey');
-                console.log(10);
                 this.fontWeight = textStyle.getVal('fontStyleName');
-                console.log(11);
                 this.fontName = textStyle.getVal('fontName');
-                console.log(12);
                 this.fontPostScriptName = textStyle.getVal('fontPostScriptName');
-                console.log(13);
                 this.textIndent = paragraphStyle.getVal('firstLineIndent');
-                console.log(14);
             } catch (e) {
-                console.log(e.message, e);
+                console.error(e.message, e);
             }
         },
 
@@ -247,5 +247,5 @@ try {
         },
     });
 } catch (e) {
-    console.log(e);
+    console.error(e);
 }

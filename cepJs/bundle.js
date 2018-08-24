@@ -93,6 +93,7 @@ class AutoCut {
         const cs = this.csInterface;
         window.start = () => cs.evalScript('start()', result => {});
         window.test = () => cs.evalScript('test()', result => {});
+        window.tryMethod = () => cs.evalScript('mergeLayer()', result => {});
     }
 
     static addConsoleSupport() {
