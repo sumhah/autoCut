@@ -115,16 +115,6 @@ DOMunitToCSS[TypeUnits.MM] = 'mm';
 DOMunitToCSS[TypeUnits.PIXELS] = 'px';
 DOMunitToCSS[TypeUnits.POINTS] = 'pt';
 
-// A sample object descriptor path looks like:
-// AGMStrokeStyleInfo.strokeStyleContent.'Clr '.'Rd  '
-// This converts either OSType or string IDs.
-makeID = function (keyStr) {
-    if (keyStr[0] == "'")	// Keys with single quotes 'ABCD' are charIDs.
-        return app.charIDToTypeID(eval(keyStr));
-    else
-        return app.stringIDToTypeID(keyStr);
-};
-
 // Clean up some pretty noisy FP numbers...
 function round1k(x) {
     return Math.round(x * 1000) / 1000;
@@ -271,4 +261,55 @@ function getFlatType(desc, ID) {
     }
 }
 
-var descCache = []
+const ALL_LAYER_ATTRS = [
+    'AGMStrokeStyleInfo',
+    'adjustment',
+    'background',
+    'bounds',
+    'boundsNoEffects',
+    'channelRestrictions',
+    'color',
+    'count',
+    'fillOpacity',
+    'filterMaskDensity',
+    'filterMaskFeather',
+    'generatorSettings',
+    'globalAngle',
+    'group',
+    'hasFilterMask',
+    'hasUserMask',
+    'hasVectorMask',
+    'itemIndex',
+    'layer3D',
+    'layerEffects',
+    'layerFXVisible',
+    'layerSection',
+    'layerID',
+    'layerKind',
+    'layerLocking',
+    'layerSVGdata',
+    'layerSection',
+    'linkedLayerIDs',
+    'metadata',
+    'mode',
+    'name',
+    'opacity',
+    'preserveTransparency',
+    'smartObject',
+    'targetChannels',
+    'textKey',
+    'useAlignedRendering',
+    'useAlignedRendering',
+    'userMaskDensity',
+    'userMaskEnabled',
+    'userMaskFeather',
+    'userMaskLinked',
+    'vectorMaskDensity',
+    'vectorMaskFeather',
+    'videoLayer',
+    'visible',
+    'visibleChannels',
+    'XMPMetadataAsUTF8',
+];
+
+var keyErrorNumber = 0;

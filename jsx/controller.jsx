@@ -1,6 +1,7 @@
 var Controller = {
     doc: app.activeDocument,
     Layer: Layer,
+    cssInfoArr: [],
     cssText: '',
 
     start: function () {
@@ -8,22 +9,27 @@ var Controller = {
         processWindow.show();
         this.reset();
         var doc = this.doc;
-        this.cssText += '.root {\n    left: 0px;\n    top: 0px;\n    width: ' + parseFloat(doc.width) + 'px;\n    height: ' + parseFloat(doc.height) + 'px;\n}\n\n';
+        this.cssInfoArr.push({
+            name: 'root',
+            left: 0,
+            top: 0,
+            width: parseFloat(doc.width),
+            height: parseFloat(doc.height),
+        })
 
-        countTime('createFolder', function () {
+        time('createFolder', function () {
             self.createFolder();
         })
-        countTime('eachTaggerLayersToExport', function () {
+        time('eachTaggerLayersToExport', function () {
             self.eachTaggerLayersToExport();
         })
-        countTime('bg', function () {
+        time('bg', function () {
             self.exportRootDocument();
         })
-        countTime('exportCssFile', function () {
+        time('exportCssFile', function () {
             self.exportCssFile();
         })
         processWindow.hide();
-        alert('Done!');
     },
 
     reset: function () {
@@ -31,7 +37,7 @@ var Controller = {
         this.cssText = '';
 
         var self = this;
-        countTime('layer init', function () {
+        time('layer init', function () {
             self.Layer.init();
         })
     },
@@ -41,9 +47,12 @@ var Controller = {
         if (!folder.exists) {
             folder.create();
         }
-        each(folder.getFiles(), function (file) {
-            file.remove();
-        });
+
+        if (IS_EXPORT_LAYER) {
+            each(folder.getFiles(), function (file) {
+                file.remove();
+            });
+        }
         this.folder = folder;
     },
 
@@ -55,11 +64,15 @@ var Controller = {
                 if (processWindow.userCancelled) {
                     return;
                 }
+                time('item.layer', function () {
+                    var l = item.layer;
+                }, 1000);
                 processWindow.update(i + 1, array.length, 'export layer ' + item.layer.name)
                 console.log('导出第' + (i + 1) + '个', item.layer.name);
                 self.doc.activeLayer = item.layer;
                 try {
                     var css = new CSS(item.layer);
+                    self.cssInfoArr.push(css);
                 } catch (e) {
                     console.error(e);
                 }
@@ -71,7 +84,7 @@ var Controller = {
     },
 
     exportCssFile: function () {
-        var cssFilePath = this.folder + '/css.css';
+        var cssFilePath = this.folder + '/css.json';
         var write_file = File(cssFilePath);
 
         if (!write_file.exists) {
@@ -85,14 +98,17 @@ var Controller = {
             write_file.lineFeed = 'Macintosh';
 
             if (out) {
-                write_file.write(this.cssText);
+                write_file.write(JSON.stringify(this.cssInfoArr));
                 write_file.close();
             }
         }
     },
 
     exportRootDocument: function () {
-        flattenCurrentDocument()
+        if (!IS_EXPORT_BG) {
+            return;
+        }
+        processWindow.update(1, 1, 'export background')
         this.exportImage('bg');
     },
 

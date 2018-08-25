@@ -93,7 +93,7 @@ class AutoCut {
         const cs = this.csInterface;
         window.start = () => cs.evalScript('start()', result => {});
         window.test = () => cs.evalScript('test()', result => {});
-        window.tryMethod = () => cs.evalScript('mergeLayer()', result => {});
+        window.tryMethod = () => cs.evalScript('tryBtnHandler()', result => {});
     }
 
     static addConsoleSupport() {
@@ -128,7 +128,7 @@ class AutoCut {
 
     static layerSelectHandler() {
         return;
-        this.csInterface.evalScript('selectLayer()', result => {});
+        this.csInterface.evalScript('selectLayerHandler()', result => {});
     }
 
     static loadJsx(fileName) {
@@ -140,7 +140,7 @@ class AutoCut {
 /* harmony export (immutable) */ __webpack_exports__["a"] = AutoCut;
 
 AutoCut.csInterface = new CSInterface();
-AutoCut.loadList = ['lib/es5-shim.jsx', 'lib/json2.jsx', 'lib/util.jsx', 'lib/console.jsx', 'lib/class.jsx', 'css/const.jsx', 'css/ActionDescriptor.jsx', 'css/PSLayer.jsx', 'css/CSSToClipboard.jsx', 'processWindow.jsx', 'css.jsx', 'layer.jsx', 'controller.jsx', 'main.jsx'];
+AutoCut.loadList = ['lib/es5-shim.jsx', 'lib/json2.jsx', 'lib/util.jsx', 'lib/console.jsx', 'lib/class.jsx', 'setting.jsx', 'css/const.jsx', 'css/ActionDescriptor.jsx', 'processWindow.jsx', 'css.jsx', 'layer.jsx', 'controller.jsx', 'main.jsx'];
 AutoCut.cssDom = document.getElementById('css');
 
 /***/ }),

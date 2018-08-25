@@ -16,6 +16,7 @@ try {
 
     var CSS = Class({
         name: 'unknown',
+        directive: undefined,
         id: 0,
         index: 0,
         kind: 1,
@@ -48,21 +49,20 @@ try {
         textIndent: null,
 
         CSS: function (layer) {
-            this.name = layer.name;
-            var DOCUMENT_INDEX_OFFSET = 0;
-            try {
-                // This throws an error if there's no background
-                if (app.activeDocument.backgroundLayer) {
-                    DOCUMENT_INDEX_OFFSET = 1;
-                }
-            } catch (err) {
-            }
-            this.index = layer.itemIndex - DOCUMENT_INDEX_OFFSET;
+            const fullName = layer.name.split('@');
+            this.name = fullName[0];
+            this.directive = fullName[1];
+            this.index = layer.itemIndex - (hasBackground() ? 1 : 0);
             this.kind = this.getLayerAttr('layerKind');
             this.id = layer.id;
-            this.showLayer();
-            this.getStyle(layer);
-            this.hideLayer();
+
+            var self = this;
+            self.showLayer();
+            time('getStyle', function () {
+                self.dumpLayerAllAttrs();
+                self.getStyle(layer);
+            });
+            self.hideLayer();
             console.log(this);
         },
 
@@ -87,7 +87,7 @@ try {
                         // children > 0  &&  visible = true
                         console.log('KIND_LayerGroupSheet 合并， 导出');
                         try {
-                            executeAction(charIDToTypeID('Mrg2'), undefined, DialogModes.NO);
+                            mergeCurrentLayer();
                             layer = app.activeDocument.activeLayer;
                             this.index = layer.itemIndex;
                             this.id = layer.id;
@@ -104,6 +104,7 @@ try {
                         this.exportLayer(layer);
                         break;
                 }
+
                 this.getBounds(layer);
                 this.getOpacity(layer);
             } catch (e) {
@@ -113,19 +114,24 @@ try {
 
         getBounds: function (layer) {
             // maybe error with use boundsNoEffects
-            const bounds = layer.boundsNoEffects;
-            this.left = bounds[0].value;
-            this.top = bounds[1].value;
-            this.width = bounds[2].value - this.left;
-            this.height = bounds[3].value - this.top;
+            var self = this;
+            time('bound', function () {
+                const bounds = layer.boundsNoEffects;
+                self.left = bounds[0].value;
+                self.top = bounds[1].value;
+                self.width = bounds[2].value - self.left;
+                self.height = bounds[3].value - self.top;
+            });
         },
 
         rasterizeLayer: function () {
-            var desc = new ActionDescriptor();
-            var ref = new ActionReference();
-            ref.putEnumerated(id('layer'), id('ordinal'), id('targetEnum'));
-            desc.putReference(id('null'), ref);
-            executeAction(id('rasterizeLayer'), desc, DialogModes.NO);
+            time('rasterizeLayer', function () {
+                var desc = new ActionDescriptor();
+                var ref = new ActionReference();
+                ref.putEnumerated(id('layer'), id('ordinal'), id('targetEnum'));
+                desc.putReference(id('null'), ref);
+                executeAction(id('rasterizeLayer'), desc, DialogModes.NO);
+            });
         },
 
         hideLayer: function () {
@@ -147,21 +153,21 @@ try {
         },
 
         exportLayer: function (layer) {
+            if (!IS_EXPORT_LAYER) {
+                return;
+            }
+
             try {
                 var self = this;
-                countTime('export image: ', function () {
+                time('export image: ', function () {
                     var fileOut = new File(sourcePath + self.name + '.png');
-                    var bounds = layer.bounds;
-                    var w = bounds[2] - bounds[0];
-                    var h = bounds[3] - bounds[1];
-
-                    countTime('newDocFromLayer', function () {
+                    time('newDocFromLayer', function () {
                         newDocFromLayer();
-                    })
-                    countTime('trimCurrentDocument', function () {
+                    });
+                    time('trimCurrentDocument', function () {
                         trimCurrentDocument();
                     });
-                    countTime('exportDocument', function () {
+                    time('exportDocument', function () {
                         var doc = app.activeDocument;
                         doc.exportDocument(fileOut, ExportType.SAVEFORWEB, AUTO_CUT_EXPORT_OPTION);
                         doc.close(SaveOptions.DONOTSAVECHANGES);
@@ -193,9 +199,9 @@ try {
 
         descColorToObj: function (desc) {
             return {
-                red: desc.getVal('red'),
-                green: desc.getVal('green'),
-                blue: desc.getVal('blue'),
+                red: Math.round(desc.getVal('red')),
+                green: Math.round(desc.getVal('green')),
+                blue: Math.round(desc.getVal('blue')),
             };
         },
 
@@ -214,19 +220,19 @@ try {
 
         getText: function (layer) {
             try {
-                var textKey = this.getLayerAttr('textKey');
-                var textStyle = this.getLayerAttr('textKey.textStyleRange.textStyle');
-                var paragraphStyle = this.getLayerAttr('textKey.paragraphStyleRange.paragraphStyle');
-                this.color = this.descColorToObj(textStyle.getVal('color'));
-                this.fontSize = parseFloat(textStyle.getVal('impliedFontSize'));
-                this.lineHeight = parseFloat(textStyle.getVal('impliedLeading'));
-                this.letterSpacing = parseFloat(textStyle.getVal('tracking'));
-                this.textAlign = paragraphStyle.getVal('align');
-                this.contents = textKey.getVal('textKey');
-                this.fontWeight = textStyle.getVal('fontStyleName');
-                this.fontName = textStyle.getVal('fontName');
-                this.fontPostScriptName = textStyle.getVal('fontPostScriptName');
-                this.textIndent = paragraphStyle.getVal('firstLineIndent');
+                // var textKey = this.getLayerAttr('textKey');
+                // var textStyle = this.getLayerAttr('textKey.textStyleRange.textStyle');
+                // var paragraphStyle = this.getLayerAttr('textKey.paragraphStyleRange.paragraphStyle');
+                // this.color = this.descColorToObj(textStyle.getVal('color'));
+                // this.fontSize = parseFloat(textStyle.getVal('impliedFontSize'));
+                // this.lineHeight = parseFloat(textStyle.getVal('impliedLeading'));
+                // this.letterSpacing = parseFloat(textStyle.getVal('tracking'));
+                // this.textAlign = paragraphStyle.getVal('align');
+                // this.contents = textKey.getVal('textKey');
+                // this.fontWeight = textStyle.getVal('fontStyleName');
+                // this.fontName = textStyle.getVal('fontName');
+                // this.fontPostScriptName = textStyle.getVal('fontPostScriptName');
+                // this.textIndent = paragraphStyle.getVal('firstLineIndent');
             } catch (e) {
                 console.error(e.message, e);
             }
@@ -244,6 +250,25 @@ try {
             }
 
             return layerDesc.getVal(keyList);
+        },
+
+        dumpLayerAllAttrs: function () {
+            var obj = {};
+            var self = this;
+
+            ALL_LAYER_ATTRS.forEach(function (attr) {
+                var desc;
+                try {
+                    desc = self.getLayerAttr(attr);
+                } catch (e) {
+                    console.error('desc error', e);
+                }
+                obj[attr] = desc instanceof ActionDescriptor ? desc.dumpDesc() : desc;
+            });
+
+            console.warn(this.name, obj);
+            console.error('keyErrorNumber', keyErrorNumber);
+            return obj;
         },
     });
 } catch (e) {

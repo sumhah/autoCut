@@ -29,8 +29,8 @@ ActionDescriptor.prototype.getVal = function (keyList, firstListItemOnly) {
     if (keyList.length == 0)
         return this;
 
-    keyStr = keyList.shift();
-    keyID = makeID(keyStr);
+    var keyStr = keyList.shift();
+    var keyID = id(keyStr);
 
     if (this.hasKey(keyID))
         switch (this.getType(keyID)) {
@@ -133,51 +133,62 @@ ActionDescriptor.prototype.dumpAllKey = function (indent) {
 // there is a table converting most (all?) charIDs into stringIDs.
 ActionDescriptor.prototype.dumpDesc = function (keyName) {
     var i;
-    if (typeof(keyName) == 'undefined')
+    if (!keyName) {
         keyName = '';
-
-    for (i = 0; i < this.count; ++i) {
-        console.log('current: ', i + '/' + this.count);
-        var key = this.getKey(i);
-        var ref;
-        var thisKey = keyName + '.' + app.typeIDToStringID(key);
-        switch (this.getType(key)) {
-            case DescValueType.OBJECTTYPE:
-                this.getObjectValue(key).dumpDesc(thisKey);
-                break;
-            case DescValueType.LISTTYPE:
-                this.getList(key).dumpDesc(thisKey);
-                break;
-            case DescValueType.REFERENCETYPE:
-                ref = this.getFlatType(key);
-                console.log(thisKey + ':ref:' + ref.refclass + ':' + ref.value);
-                break;
-            default:
-                console.log(thisKey + ': ' + ActionDescriptor.dumpValue(this.getFlatType(key)));
-        }
     }
+
+    var obj = {};
+
+    try {
+        for (i = 0; i < this.count; i += 1) {
+            // console.log('current: ' + keyName, i + '/' + this.count);
+            var keyTypeId = this.getKey(i);
+            var thisKey = keyName + '.' + app.typeIDToStringID(keyTypeId);
+            var innerName = app.typeIDToStringID(keyTypeId);
+            switch (this.getType(keyTypeId)) {
+                case DescValueType.OBJECTTYPE:
+                    obj[innerName] = this.getObjectValue(keyTypeId).dumpDesc(thisKey);
+                    break;
+                case DescValueType.LISTTYPE:
+                    obj[innerName] = this.getList(keyTypeId).dumpDesc(thisKey);
+                    break;
+                case DescValueType.REFERENCETYPE:
+                    obj[innerName] = this.getFlatType(keyTypeId);
+                    break;
+                default:
+                    obj[innerName] = ActionDescriptor.dumpValue(this.getFlatType(keyTypeId));
+            }
+        }
+    } catch (e) {
+        keyErrorNumber += 1;
+        // console.error('getKeyError', app.typeIDToStringID(keyTypeId), e);
+    }
+    return obj;
 };
 
 ActionList.prototype.dumpDesc = function (keyName) {
     var i;
-    if (typeof(keyName) == 'undefined')
+    if (!keyName) {
         keyName = '';
+    }
 
-    if (this.count == 0)
-        console.log(keyName + ' <empty list>');
-    else
+    var arr = [];
+    if (this.count === 0) {
+        return arr;
+    } else {
         for (i = 0; i < this.count; ++i) {
             try {
                 if (this.getType(i) == DescValueType.OBJECTTYPE)
-                    this.getObjectValue(i).dumpDesc(keyName + '[' + i + ']');
+                    arr.push(this.getObjectValue(i).dumpDesc(keyName + '[' + i + ']'));
                 else if (this.getType(i) == DescValueType.LISTTYPE)
-                    this.getList(i).dumpDesc(keyName + '[' + i + ']');
+                    arr.push(this.getList(i).dumpDesc(keyName + '[' + i + ']'));
                 else
-                    console.log(keyName + '[' + i + ']:'
-                        + ActionDescriptor.dumpValue(this.getFlatType(i)));
+                    arr.push(ActionDescriptor.dumpValue(this.getFlatType(i)));
             }
             catch (err) {
-                console.log('Error ' + keyName + '[' + i + ']: ' + err.message);
+                console.error('Error ' + keyName + '[' + i + ']: ' + err.message);
             }
         }
+    }
+    return arr;
 };

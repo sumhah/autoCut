@@ -20,17 +20,34 @@ var Layer = {
 
     init: function () {
         this.reset();
-        this.collectLayers()
-        this.allLayers = this.layers.concat(this.groups);
-        this.taggedLayers = this.allLayers.filter(function (item, i, array) {
-            processWindow.update(i, array.length - 1, 'filter out labeled layers')
-            return /[\w-_]+@[\w-_]*/.test(item.layer.name)
+        // this.collectLayers()
+        // this.allLayers = this.layers.concat(this.groups);
+
+
+        var matches;
+        time('collectNamesAM', function () {
+            matches = collectNamesAM(/[\w-_]+@[\w-_]*/);
         })
+        var doc = app.activeDocument;
+        console.log(matches);
+        this.taggedLayers = matches.map(function (item, i, array) {
+            processWindow.update(i + 1, array.length, 'filter out labeled layers')
+
+            time('makeActiveByIndex' + '  ' + i, function () {
+                makeActiveByIndex(item, false);
+            })
+            return {
+                layer: doc.activeLayer,
+            };
+        })
+
+        // this.taggedLayers = this.allLayers.filter(function (item, i, array) {
+        //     processWindow.update(i, array.length - 1, 'filter out labeled layers')
+        //     return /[\w-_]+@[\w-_]*/.test(item.layer.name)
+        // })
+
         this.uniqueTaggedLayers = this.getUniqueLayer().sort(function (item1, item2) {
-            var bound1 = item1.layer.bounds;
-            var bound2 = item2.layer.bounds;
-            var w1 = bound1bound1[2].value - bound1[0].value
-            return (bound1[2].value - bound1[0].value) - (bound2[2].value - bound2[0].value)
+            return item1.area - item2.area;
         })
         console.log('layers count: ', this.uniqueTaggedLayers.length);
     },
@@ -45,59 +62,6 @@ var Layer = {
         this.taggedLayers = [];
         this.untaggedLayers = [];
         this.uniqueTaggedLayers = [];
-    },
-
-    exportCurrentPage: function () {
-        this.reset();
-
-        var collect = this.collectLayers();
-        this.layers = collect.layers.concat(collect.groups);
-        this.groups = collect.groups;
-
-        var doc = app.activeDocument;
-
-        doc.crop([
-                UnitValue(0, 'px'),
-                UnitValue(88, 'px'),
-                UnitValue(doc.width, 'px'),
-                UnitValue(doc.height, 'px'),
-            ],
-        );
-
-        var arr = [];
-        var name = doc.name.replace('.psd', '');
-        var str = name + ': (\n';
-        this.layers.forEach(function (item, i) {
-            var curLayer = item.layer;
-            var groupLayer;
-
-            try {
-                if (curLayer.typename === 'LayerSet') {
-                    if (curLayer.name === '查看范例') {
-                        makeLayerVisible(item);
-
-                        if (curLayer.layers.length > 0) {
-                            groupLayer = curLayer.merge();
-                            arr.push(parseInt(groupLayer.bounds[1].asCSS()));
-                            groupLayer.remove();
-                        }
-                    } else if (curLayer.name === '封面突出食物 主题明确 拷贝 2' || curLayer.name === '组 82' || curLayer.name === '热门攻略' || curLayer.name === '底标') {
-                        groupLayer = curLayer.merge();
-                        groupLayer.remove();
-                    }
-                }
-            } catch (e) {
-                console.log(e);
-            }
-        });
-        arr.sort(function (num1, num2) {
-            return num1 - num2;
-        }).forEach(function (item, i) {
-            str += (i + 1) + ': ' + item + ',\n';
-        });
-        str += '),\n';
-        this.str += str;
-        Controller.exportImage(name);
     },
 
     collectLayers: function () {
@@ -159,7 +123,15 @@ var Layer = {
             if (processWindow.userCancelled) {
                 return;
             }
-            this.collectOneLayer(i);
+
+
+            // this.ref = new ActionReference();
+            // this.ref.putIndex(id('layer'), i);
+            // this.desc = app.executeActionGet(this.ref);
+
+
+
+            // this.collectOneLayer(i);
             processWindow.update(this.layerCount - i + 1, this.layerCount, 'traverse layer');
         }
     },
@@ -254,13 +226,20 @@ var Layer = {
 
     getUniqueLayer: function () {
         var uniqueLayers = [];
-        this.taggedLayers.forEach(function (item) {
-            if (uniqueLayers.every(function (uniqueItem) {
-                return uniqueItem.layer.name !== item.layer.name;
-            })) {
-                uniqueLayers.push(item);
-            }
-        });
+        var self = this;
+        time('uniqueLayers', function () {
+            self.taggedLayers.forEach(function (item) {
+                if (uniqueLayers.every(function (uniqueItem) {
+                    return uniqueItem.layer.name !== item.layer.name;
+                })) {
+                    var bounds = item.layer.bounds;
+                    var width = bounds[2].value - bounds[0].value;
+                    var height = bounds[3].value - bounds[1].value;
+                    item.area = width * height;
+                    uniqueLayers.push(item);
+                }
+            });
+        })
         return uniqueLayers;
     },
 

@@ -141,7 +141,7 @@ cssToClip.addText = function (text, browserTagList) {
         }
     else
         this.cssText += (this.indentSpaces + text + '\n');
-//	$.writeln(text);	// debug
+    //	$.writeln(text);	// debug
 };
 
 cssToClip.addStyleLine = function (cssText, baseDesc, browserTagList) {
@@ -249,9 +249,9 @@ cssToClip.extractShapeGeometry = function () {
                 var xy = i % 2;	// 0 = x, 1 = y, alternates as we traverse the oval sides
                 if (!sameCoord(pts[i], 1 - xy)) return null;
                 if (!near(pts[i].leftDirection[xy] - pts[i].anchor[xy],
-                        (pts[next(i)].anchor[xy] - pts[i].anchor[xy]) * kEllipseDist, 100)) return null;
+                    (pts[next(i)].anchor[xy] - pts[i].anchor[xy]) * kEllipseDist, 100)) return null;
                 if (!near(pts[i].anchor[xy] - pts[i].rightDirection[xy],
-                        (pts[prev(i)].anchor[xy] - pts[i].anchor[xy]) * kEllipseDist, 100)) return null;
+                    (pts[prev(i)].anchor[xy] - pts[i].anchor[xy]) * kEllipseDist, 100)) return null;
             }
             // Return the X,Y radius
             return [pts[1].anchor[0] - pts[0].anchor[0], pts[1].anchor[1] - pts[0].anchor[1], 'ellipse'];
@@ -259,11 +259,12 @@ cssToClip.extractShapeGeometry = function () {
         else if (subPath.closed && (subPath.pathPoints.length == 8))	// RoundRect?
         {
             var pts = subPath.pathPoints;
+
             //dumpPts( pts );
             function sameCoord2(pt, xy, io) {
                 return (sameCoord(pt, xy)
-                && ( ((io == 0) && (pt.rightDirection[1 - xy] == pt.anchor[1 - xy]))
-                || ((io == 1) && (pt.leftDirection[1 - xy] == pt.anchor[1 - xy])) ) );
+                    && (((io == 0) && (pt.rightDirection[1 - xy] == pt.anchor[1 - xy]))
+                        || ((io == 1) && (pt.leftDirection[1 - xy] == pt.anchor[1 - xy]))));
             }
 
             function next(index) {
@@ -284,12 +285,12 @@ cssToClip.extractShapeGeometry = function () {
                 if (!sameCoord2(pts[i], 1 - hv, 1 - io)) return null;
                 if (io == 0) {
                     if (!near(arm(pts[i], hv, io) - pts[i].anchor[hv],
-                            (pts[prev(i)].anchor[hv] - pts[i].anchor[hv]) * kEllipseDist, 10))
+                        (pts[prev(i)].anchor[hv] - pts[i].anchor[hv]) * kEllipseDist, 10))
                         return null;
                 }
                 else {
                     if (!near(arm(pts[i], hv, io) - pts[i].anchor[hv],
-                            (pts[next(i)].anchor[hv] - pts[i].anchor[hv]) * kEllipseDist, 10))
+                        (pts[next(i)].anchor[hv] - pts[i].anchor[hv]) * kEllipseDist, 10))
                         return null;
                 }
             }
@@ -575,7 +576,7 @@ cssToClip.getTextLayerCSS = function (boundsInfo) {
     if (textString.length === 0)
         return;
 
-    this.addText('text-content: ' +  this.currentLayer.textItem.contents + ';', this.browserTags);
+    this.addText('text-content: ' + this.currentLayer.textItem.contents + ';', this.browserTags);
 
     var cssUnits = DOMunitToCSS[app.preferences.rulerUnits];
     boundsInfo.textOffset = [UnitValue(0, cssUnits), UnitValue(0, cssUnits)];
@@ -589,8 +590,8 @@ cssToClip.getTextLayerCSS = function (boundsInfo) {
         defaultDesc = this.getLayerAttr('textKey.textStyleRange.textStyle.baseParentStyle');
 
     if (textDesc) {
-//		this.addStyleLine2( "font-size: $size$;", textDesc, defaultDesc );
-//         this.addStyleLine2('font-family: "$fontName$";', textDesc, defaultDesc);
+        //		this.addStyleLine2( "font-size: $size$;", textDesc, defaultDesc );
+        //         this.addStyleLine2('font-family: "$fontName$";', textDesc, defaultDesc);
         if (opacity == 1.0) {
             this.addStyleLine2('color: $color$;', textDesc, defaultDesc);// Color can just default to black
         }
@@ -705,7 +706,6 @@ cssToClip.getTextLayerCSS = function (boundsInfo) {
 cssToClip.getPixelLayerCSS = function () {
     var name = this.getLayerAttr('name');
     // If suffix isn't present, add one.  Assume file is in same folder as parent.
-
 
     if (name.search(/[.]((\w){3,4})$/) < 0) {
         this.addStyleLine('background-image: url("$name$.png");');
@@ -963,7 +963,7 @@ cssToClip.copyLayerCSSToClipboardWithProgress = function (outResult) {
         // before the progress bar is up.  This message isn't optimal, but it was too late to get a
         // proper error message translated, so this was close enough.
         // MUST USE THIS FOR RELEASE PRIOR TO CS7/PS14
-//		alert( localize( "$$$/MaskPanel/MaskSelection/NoLayerSelected=No layer selected" ) );
+        //		alert( localize( "$$$/MaskPanel/MaskSelection/NoLayerSelected=No layer selected" ) );
         alert(localize('$$$/Scripts/CopyCSSToClipboard/Error=Internal error creating CSS: ') + err.message +
             localize('$$$/Scripts/CopyCSSToClipboard/ErrorLine= at script line ') + err.line);
     }
@@ -996,7 +996,10 @@ cssToClip.dumpLayerAttr = function (keyName) {
         s = [];
         for (var i in desc) {
             if (desc.hasOwnProperty(i)) {
-                if ((typeof desc[i] == 'object') && (desc[i].typename in {'ActionDescriptor': 1, 'ActionList': 1})) {
+                if ((typeof desc[i] == 'object') && (desc[i].typename in {
+                    'ActionDescriptor': 1,
+                    'ActionList': 1,
+                })) {
                     desc[i].dumpDesc(keyName + '[' + i + ']');
                 }
                 else {
@@ -1012,16 +1015,56 @@ cssToClip.dumpLayerAttr = function (keyName) {
 };
 
 // Taken from inspection of ULayerElement.cpp
-cssToClip.allLayerAttrs = ['AGMStrokeStyleInfo', 'adjustment', 'background', 'bounds',
-    'boundsNoEffects', 'channelRestrictions', 'color', 'count', 'fillOpacity', 'filterMaskDensity',
-    'filterMaskFeather', 'generatorSettings', 'globalAngle', 'group', 'hasFilterMask',
-    'hasUserMask', 'hasVectorMask', 'itemIndex', 'layer3D', 'layerEffects', 'layerFXVisible',
-    'layerSection', 'layerID', 'layerKind', 'layerLocking', 'layerSVGdata', 'layerSection',
-    'linkedLayerIDs', 'metadata', 'mode', 'name', 'opacity', 'preserveTransparency',
-    'smartObject', 'targetChannels', 'textKey', 'useAlignedRendering', 'useAlignedRendering',
-    'userMaskDensity', 'userMaskEnabled', 'userMaskFeather', 'userMaskLinked',
-    'vectorMaskDensity', 'vectorMaskFeather', 'videoLayer', 'visible', 'visibleChannels',
-    'XMPMetadataAsUTF8'];
+cssToClip.allLayerAttrs = [
+    'AGMStrokeStyleInfo',
+    'adjustment',
+    'background',
+    'bounds',
+    'boundsNoEffects',
+    'channelRestrictions',
+    'color',
+    'count',
+    'fillOpacity',
+    'filterMaskDensity',
+    'filterMaskFeather',
+    'generatorSettings',
+    'globalAngle',
+    'group',
+    'hasFilterMask',
+    'hasUserMask',
+    'hasVectorMask',
+    'itemIndex',
+    'layer3D',
+    'layerEffects',
+    'layerFXVisible',
+    'layerSection',
+    'layerID',
+    'layerKind',
+    'layerLocking',
+    'layerSVGdata',
+    'layerSection',
+    'linkedLayerIDs',
+    'metadata',
+    'mode',
+    'name',
+    'opacity',
+    'preserveTransparency',
+    'smartObject',
+    'targetChannels',
+    'textKey',
+    'useAlignedRendering',
+    'useAlignedRendering',
+    'userMaskDensity',
+    'userMaskEnabled',
+    'userMaskFeather',
+    'userMaskLinked',
+    'vectorMaskDensity',
+    'vectorMaskFeather',
+    'videoLayer',
+    'visible',
+    'visibleChannels',
+    'XMPMetadataAsUTF8'
+];
 
 // Dump all the available attributes on the layer.
 cssToClip.dumpAllLayerAttrs = function () {

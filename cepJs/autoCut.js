@@ -6,10 +6,9 @@ export default class AutoCut {
         'lib/util.jsx',
         'lib/console.jsx',
         'lib/class.jsx',
+        'setting.jsx',
         'css/const.jsx',
         'css/ActionDescriptor.jsx',
-        'css/PSLayer.jsx',
-        'css/CSSToClipboard.jsx',
         'processWindow.jsx',
         'css.jsx',
         'layer.jsx',
@@ -40,7 +39,7 @@ export default class AutoCut {
         });
         window.test = () => cs.evalScript('test()', (result) => {
         });
-        window.tryMethod = () => cs.evalScript('mergeLayer()', (result) => {
+        window.tryMethod = () => cs.evalScript('tryBtnHandler()', (result) => {
         });
     }
 
@@ -76,7 +75,7 @@ export default class AutoCut {
 
     static layerSelectHandler() {
         return;
-        this.csInterface.evalScript('selectLayer()', (result) => {
+        this.csInterface.evalScript('selectLayerHandler()', (result) => {
             // console.log(result);
             // const css = cssParser.parse(result);
             // console.log(css);
