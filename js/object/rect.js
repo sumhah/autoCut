@@ -4,16 +4,11 @@
 
 class Rect {
     constructor(cssInfo) {
-        // hack: 补正因border导致的坐标偏差
         this.name = cssInfo.name;
-        let borderWidth = 0;
-        if (cssInfo['border-width']) {
-            borderWidth = parseFloat(cssInfo['border-width']);
-        }
-        this.x = parseFloat(cssInfo.left) + borderWidth / 2;
-        this.y = parseFloat(cssInfo.top) + borderWidth;
-        this.width = parseFloat(cssInfo.width);
-        this.height = parseFloat(cssInfo.height);
+        this.x = cssInfo.left;
+        this.y = cssInfo.top;
+        this.width = cssInfo.width
+        this.height = cssInfo.height
         this.area = this.width * this.height;
         this.x1 = this.x;
         this.y1 = this.y;

@@ -1,5 +1,9 @@
 function undo(doc) {
-    doc.activeHistoryState = doc.historyStates[doc.historyStates.length - 2];
+    try {
+        doc.activeHistoryState = doc.historyStates[doc.historyStates.length - 2];
+    } catch (e) {
+        console.error('undo Error', e);
+    }
 }
 
 function rgbToHex(r, g, b) {
@@ -185,3 +189,109 @@ function toggleOnlyShowCurrentLayer() {
     desc1378.putBoolean(idTglO, true);
     executeAction(idShw, desc1378, DialogModes.NO);
 }
+
+function extractShapeGeometry() {
+    // We accept a shape as conforming if the coords are within "magnitude"
+    // of the overall size.
+    function near(a, b, magnitude) {
+        a = Math.abs(a);
+        b = Math.abs(b);
+        return Math.abs(a - b) < (Math.max(a, b) / magnitude);
+    }
+
+    function sameCoord(pathPt, xy) {
+        return (pathPt.rightDirection[xy] == pathPt.anchor[xy])
+            && (pathPt.leftDirection[xy] == pathPt.anchor[xy]);
+    }
+
+    function dumpPts(pts)	// For debug viewing in Matlab
+    {
+        function pt2str(pt) {
+            return '[' + Math.floor(pt[0]) + ', ' + Math.floor(pt[1]) + ']';
+        }
+
+        var i;
+        for (i = 0; i < pts.length; ++i)
+            $.writeln('[' + [pt2str(pts[i].rightDirection), pt2str(pts[i].anchor), pt2str(pts[i].leftDirection)].join('; ') + '];');
+    }
+
+    // Control point location for Bezier arcs.
+    // See problem 1, http://www.graphics.stanford.edu/courses/cs248-98-fall/Final/q1.html
+    const kEllipseDist = 4 * (Math.sqrt(2) - 1) / 3;
+
+    if (app.activeDocument.pathItems.length == 0)
+        return null;	// No path
+
+    // Grab the path name from the layer name (it's auto-generated)
+    var i, pathName = localize('$$$/ShapeLayerPathName=^0 Shape Path');
+    var path = app.activeDocument.pathItems[pathName.replace(/[^]0/, app.activeDocument.activeLayer.name)];
+
+    // If we have a plausible path, walk the geometry and see if it matches a shape we know about.
+    if ((path.kind == PathKind.VECTORMASK) && (path.subPathItems.length == 1)) {
+        var subPath = path.subPathItems[0];
+        if (subPath.closed && (subPath.pathPoints.length == 4))	// Ellipse?
+        {
+            function next(index) {
+                return (index + 1) % 4;
+            }
+
+            function prev(index) {
+                return (index > 0) ? (index - 1) : 3;
+            }
+
+            var pts = subPath.pathPoints;
+
+            // dumpPts( pts );
+            for (i = 0; i < 4; ++i) {
+                var xy = i % 2;	// 0 = x, 1 = y, alternates as we traverse the oval sides
+                if (!sameCoord(pts[i], 1 - xy)) return null;
+                if (!near(pts[i].leftDirection[xy] - pts[i].anchor[xy],
+                    (pts[next(i)].anchor[xy] - pts[i].anchor[xy]) * kEllipseDist, 100)) return null;
+                if (!near(pts[i].anchor[xy] - pts[i].rightDirection[xy],
+                    (pts[prev(i)].anchor[xy] - pts[i].anchor[xy]) * kEllipseDist, 100)) return null;
+            }
+            // Return the X,Y radius
+            return [pts[1].anchor[0] - pts[0].anchor[0], pts[1].anchor[1] - pts[0].anchor[1], 'ellipse'];
+        }
+        else if (subPath.closed && (subPath.pathPoints.length == 8))	// RoundRect?
+        {
+            var pts = subPath.pathPoints;
+
+            //dumpPts( pts );
+            function sameCoord2(pt, xy, io) {
+                return (sameCoord(pt, xy)
+                    && (((io == 0) && (pt.rightDirection[1 - xy] == pt.anchor[1 - xy]))
+                        || ((io == 1) && (pt.leftDirection[1 - xy] == pt.anchor[1 - xy]))));
+            }
+
+            function next(index) {
+                return (index + 1) % 8;
+            }
+
+            function prev(index) {
+                return (index > 0) ? (index - 1) : 7;
+            }
+
+            function arm(pt, xy, io) {
+                return (io == 0) ? pt.rightDirection[xy] : pt.leftDirection[xy];
+            }
+
+            for (i = 0; i < 8; ++i) {
+                var io = i % 2;			// Incoming / Outgoing vector on the anchor point
+                var hv = (i >> 1) % 2;	// Horizontal / Vertical side of the round rect
+                if (!sameCoord2(pts[i], 1 - hv, 1 - io)) return null;
+                if (io == 0) {
+                    if (!near(arm(pts[i], hv, io) - pts[i].anchor[hv],
+                        (pts[prev(i)].anchor[hv] - pts[i].anchor[hv]) * kEllipseDist, 10))
+                        return null;
+                }
+                else {
+                    if (!near(arm(pts[i], hv, io) - pts[i].anchor[hv],
+                        (pts[next(i)].anchor[hv] - pts[i].anchor[hv]) * kEllipseDist, 10))
+                        return null;
+                }
+            }
+            return [pts[2].anchor[0] - pts[1].anchor[0], pts[2].anchor[1] - pts[1].anchor[1], 'round rect'];
+        }
+    }
+};

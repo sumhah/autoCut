@@ -3,10 +3,10 @@
     time('start', function () {
         try {
             doc.suspendHistory('autoCut script...', 'Controller.start()');
-            $.sleep(100);
+            $.sleep(200);
             undo(doc);
         } catch (e) {
-            console.log(e);
+            console.error(e);
         }
     })
     return '';
@@ -14,7 +14,10 @@
 
 function selectLayerHandler() {
     console.log('\n\n\n------------new CSS------------\n');
-    new CSS(app.activeDocument.activeLayer)
+    return JSON.stringify(new CSS(app.activeDocument.activeLayer, {
+        noExportImg: true,
+        noHide: true,
+    }))
 }
 
 var toggle = true;
@@ -27,8 +30,7 @@ function tryBtnHandler() {
     var layer = app.activeDocument.activeLayer;
     var doc = app.activeDocument;
 
-    var b = layer.bounds;
-    var fileOut = new File(sourcePath + 'just' + ++i + '.png');
+    doc.trim(TrimType.TRANSPARENT);
     if (toggle) {
 
         // countTime('exportDocument', function () {

@@ -20,6 +20,7 @@ try {
         id: 0,
         index: 0,
         kind: 1,
+        type: '',
 
         left: 0,
         top: 0,
@@ -42,19 +43,20 @@ try {
         lineHeight: null,
         letterSpacing: null,
         textAlign: null,
-        contents: null,
+        textContent: null,
         fontWeight: null,
         fontName: null,
         fontPostScriptName: null,
         textIndent: null,
 
-        CSS: function (layer) {
+        CSS: function (layer, options) {
             const fullName = layer.name.split('@');
             this.name = fullName[0];
             this.directive = fullName[1];
             this.index = layer.itemIndex - (hasBackground() ? 1 : 0);
             this.kind = this.getLayerAttr('layerKind');
             this.id = layer.id;
+            this.options = options || {}
 
             var self = this;
             self.showLayer();
@@ -62,8 +64,10 @@ try {
                 self.dumpLayerAllAttrs();
                 self.getStyle(layer);
             });
-            self.hideLayer();
-            console.log(this);
+
+            if (!this.options.noHide) {
+                self.hideLayer();
+            }
         },
 
         getStyle: function (layer) {
@@ -71,14 +75,17 @@ try {
                 switch (this.kind) {
                     case KIND_PixelSheet:
                         console.log('PixelSheet 将其导出');
+                        this.type = 'image';
                         this.exportLayer(layer);
                         break;
                     case KIND_TextSheet:
                         console.log('KIND_TextSheet 获取文字属性');
+                        this.type = 'text';
                         this.getText(layer);
                         break;
                     case KIND_VectorSheet:
                         console.log('KIND_VectorSheet 获取形状属性');
+                        this.type = 'shape';
                         this.getBorder(layer);
                         this.getBackgroundColor();
                         this.getBorderRadius();
@@ -87,6 +94,7 @@ try {
                         // children > 0  &&  visible = true
                         console.log('KIND_LayerGroupSheet 合并， 导出');
                         try {
+                            this.type = 'image';
                             mergeCurrentLayer();
                             layer = app.activeDocument.activeLayer;
                             this.index = layer.itemIndex;
@@ -98,6 +106,7 @@ try {
                         break;
                     case KIND_SmartObjectSheet:
                     default:
+                        this.type = 'image';
                         console.log('KIND_SmartObjectSheet，栅格化 导出');
                         this.rasterizeLayer();
                         layer = app.activeDocument.activeLayer;
@@ -117,10 +126,10 @@ try {
             var self = this;
             time('bound', function () {
                 const bounds = layer.boundsNoEffects;
-                self.left = bounds[0].value;
-                self.top = bounds[1].value;
-                self.width = bounds[2].value - self.left;
-                self.height = bounds[3].value - self.top;
+                self.left = bounds[0].value + OFFSET_LEFT;
+                self.top = bounds[1].value + OFFSET_TOP;
+                self.width = bounds[2].value - bounds[0].value;
+                self.height = bounds[3].value - bounds[1].value;
             });
         },
 
@@ -153,7 +162,7 @@ try {
         },
 
         exportLayer: function (layer) {
-            if (!IS_EXPORT_LAYER) {
+            if (!IS_EXPORT_LAYER || this.options.noExportImg) {
                 return;
             }
 
@@ -208,31 +217,35 @@ try {
         getBorderRadius: function () {
             const radius = this.getLayerAttr('keyOriginType.keyOriginRRectRadii');
             if (!radius) {
+                const shapeGeom = extractShapeGeometry();
+                if (!shapeGeom) {
+                    return;
+                }
+                if (shapeGeom[2] === 'ellipse') {
+                    this.borderRadius = '50%';
+                } else {
+                    this.borderRadius = Math.round((shapeGeom[0] + shapeGeom[1]) / 2);
+                }
                 return;
             }
-            this.borderRadius = {
-                topRight: radius.getVal('topRight'),
-                topLeft: radius.getVal('topLeft'),
-                bottomRight: radius.getVal('bottomRight'),
-                bottomLeft: radius.getVal('bottomLeft'),
-            };
+            this.borderRadius = radius.getVal('topLeft') + ' ' + radius.getVal('topRight') + ' ' + radius.getVal('bottomRight') + ' ' + radius.getVal('bottomLeft')
         },
 
         getText: function (layer) {
             try {
-                // var textKey = this.getLayerAttr('textKey');
-                // var textStyle = this.getLayerAttr('textKey.textStyleRange.textStyle');
-                // var paragraphStyle = this.getLayerAttr('textKey.paragraphStyleRange.paragraphStyle');
-                // this.color = this.descColorToObj(textStyle.getVal('color'));
-                // this.fontSize = parseFloat(textStyle.getVal('impliedFontSize'));
-                // this.lineHeight = parseFloat(textStyle.getVal('impliedLeading'));
-                // this.letterSpacing = parseFloat(textStyle.getVal('tracking'));
-                // this.textAlign = paragraphStyle.getVal('align');
-                // this.contents = textKey.getVal('textKey');
-                // this.fontWeight = textStyle.getVal('fontStyleName');
-                // this.fontName = textStyle.getVal('fontName');
-                // this.fontPostScriptName = textStyle.getVal('fontPostScriptName');
-                // this.textIndent = paragraphStyle.getVal('firstLineIndent');
+                var textKey = this.getLayerAttr('textKey');
+                var textStyle = this.getLayerAttr('textKey.textStyleRange.textStyle');
+                var paragraphStyle = this.getLayerAttr('textKey.paragraphStyleRange.paragraphStyle');
+                this.color = this.descColorToObj(textStyle.getVal('color'));
+                this.fontSize = parseFloat(textStyle.getVal('impliedFontSize'));
+                this.lineHeight = parseFloat(textStyle.getVal('impliedLeading'));
+                this.letterSpacing = parseFloat(textStyle.getVal('tracking'));
+                this.textAlign = paragraphStyle.getVal('align');
+                this.textContent = textKey.getVal('textKey');
+                this.fontWeight = textStyle.getVal('fontStyleName');
+                this.fontName = textStyle.getVal('fontName');
+                this.fontPostScriptName = textStyle.getVal('fontPostScriptName');
+                this.textIndent = paragraphStyle.getVal('firstLineIndent');
             } catch (e) {
                 console.error(e.message, e);
             }

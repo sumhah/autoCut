@@ -64,9 +64,6 @@ var Controller = {
                 if (processWindow.userCancelled) {
                     return;
                 }
-                time('item.layer', function () {
-                    var l = item.layer;
-                }, 1000);
                 processWindow.update(i + 1, array.length, 'export layer ' + item.layer.name)
                 console.log('导出第' + (i + 1) + '个', item.layer.name);
                 self.doc.activeLayer = item.layer;

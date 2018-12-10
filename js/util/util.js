@@ -28,5 +28,13 @@ global.echoSpace = (n) => {
     return ' '.repeat(n);
 };
 
+global.rgbObjToCSS = ({red, green, blue}, opacity) => {
+    if (opacity !== 100) {
+        return `rgba(${red}, ${green}, ${blue}, ${(opacity / 100).toFixed(4)})`
+    }
+
+    return `rgb(${red}, ${green}, ${blue})`
+}
+
 
 

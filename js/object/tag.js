@@ -11,26 +11,17 @@ class Tag extends Box {
     constructor(cssInfo) {
         super(cssInfo);
         this.cssInfo = cssInfo;
-        this.type = this.getTagType(cssInfo);
+
+        console.log(cssInfo);
+        this.type = cssInfo.type;
         this.className = this.name;
         this.textContent = '';
-        this.zIndex = cssInfo['z-index'] ? parseInt(cssInfo['z-index']) : 0;
         this.cssObj = {};
         this.cssArr = [];
         this.isRoot = this.name === 'root';
         this.inheritCssObj = {};
         this.borderWidth = 0;
         this.paddingTop = 0;
-    }
-
-    getTagType(cssInfo) {
-        if (cssInfo['font-size']) {
-            return 'text';
-        } else if (cssInfo['background-image'] && cssInfo['background-image'].indexOf('url(') !== -1) {
-            return 'image';
-        } else {
-            return 'shape';
-        }
     }
 
     calcCss() {
@@ -176,14 +167,17 @@ class Tag extends Box {
     }
 
     _setRight() {
-        this.right = (this.lateParent.x2 + this.lateParent.borderWidth) - this.x2;
+        this.right = this.lateParent.x2 + this.lateParent.borderWidth - this.x2;
     }
 
     _setBottom() {
-        this.bottom = (this.lateParent.y2 + this.lateParent.borderWidth) - this.y2;
+        this.bottom = this.lateParent.y2 + this.lateParent.borderWidth - this.y2;
     }
 
     _getCssWidth() {
+        if (this.type === 'text') {
+            return this.width + 4
+        }
         return this.width - this.borderWidth * 2;
     }
 
@@ -199,52 +193,36 @@ class Tag extends Box {
     }
 
     _setCssFromCssInfo() {
-        const cssInfo = this.cssInfo;
+        const cssInfo = this.cssInfo
+        const opacity = cssInfo['opacity']
         switch (this.type) {
             case 'text':
-                [
-                    'font-size',
-                    // 'line-height',
-                    'color'
-                ].forEach(prop => this._absorbPropFromCssInfo(prop));
-
-                //set text content
-                const fontSize = parseFloat(cssInfo['font-size']);
-                const fontNumberPerLine = Math.floor(this.width / fontSize);
-                const lineNumber = Math.floor(this.height / (fontSize * parseFloat(cssInfo['line-height'])));
-
-                if (this.cssInfo['text-content']) {
-                    this.textContent = this.cssInfo['text-content'].replace(/\r/g, '<br>');
-                } else {
-                    this.textContent = '哈'.repeat(fontNumberPerLine * Math.max(1, lineNumber));
+                this.cssObj['font-size'] = cssInfo.fontSize + 'px'
+                this.cssObj['color'] = rgbObjToCSS(cssInfo.color, opacity)
+                // this.cssObj['line-height'] = cssInfo.lineHeight + 'px'
+                const fontWeight = cssInfo.fontWeight
+                if (fontWeight) {
+                    if (fontWeight === 'Bold') {
+                        this.cssObj['font-weight'] = 'bold'
+                    } else if (fontWeight === 'Italic') {
+                        this.cssObj['font-weight'] = 'italic'
+                    }
                 }
+                this.textContent = cssInfo['textContent'].replace(/\r/g, '<br>');
                 break;
             case 'image':
                 this.cssObj['background-image'] = `url('../images/${this.name}.png')`;
                 this.cssObj['background-size'] = '100% 100%';
                 break;
             case 'shape':
-                [
-                    'border',
-                    'border-style',
-                    'border-width',
-                    'border-color',
-                    'border-left',
-                    'border-top',
-                    'border-right',
-                    'border-bottom',
-                    'border-radius',
-                    'background-image',
-                    'background-color',
-                    'box-shadow',
-                ].forEach(prop => this._absorbPropFromCssInfo(prop));
-
-                if (this.cssObj['border-style']) {
-                    this.cssObj['border'] = `${this.cssObj['border-width']} ${this.cssObj['border-style']} ${this.cssObj['border-color']}`;
-                    this.borderWidth = parseFloat(this.cssObj['border-width']);
-                    delete this.cssObj['border-width'];
-                    delete this.cssObj['border-style'];
-                    delete this.cssObj['border-color'];
+                if (cssInfo.borderWidth) {
+                    this.cssObj['border'] = `${cssInfo.borderWidth}px solid ${rgbObjToCSS(cssInfo.borderColor, opacity)}`;
+                }
+                if (cssInfo.borderRadius) {
+                    this.cssObj['border-radius'] = cssInfo.borderRadius
+                }
+                if (cssInfo.backgroundColor) {
+                    this.cssObj['background-color'] = rgbObjToCSS(cssInfo.backgroundColor, opacity)
                 }
                 break;
         }
@@ -260,11 +238,13 @@ class Tag extends Box {
          */
         // todo tagCleaner => tagOutputTool
 
-        // 文字图层暂不输出宽度，待精准判断后智能缩放宽度再开启
+
+        // 废弃: 文字图层暂不输出宽度，待精准判断后智能缩放宽度再开启
+        this.cssObj['width'] = this._getCssWidth().toUnit();
+
         if (this.type !== 'text') {
-            this.cssObj['width'] = this._getCssWidth().toUnit();
+            this.cssObj['height'] = this._getCssHeight().toUnit();
         }
-        this.cssObj['height'] = this._getCssHeight().toUnit();
 
         if (this.isRoot) {
             this.cssObj['position'] = 'relative';

@@ -4,13 +4,10 @@
 require('../setting');
 require('../util/expand');
 const Tag = require('./tag');
-console.log(2);
 
 class TagController {
     constructor(cssInfoArr) {
-        this._arr = cssInfoArr.map((item => new Tag(item))).sort((item1, item2) => {
-            return item2.area - item1.area;
-        });
+        this._arr = cssInfoArr.map(item => new Tag(item)).sort((item1, item2) => item2.area - item1.area)
         this.html = '';
         this.vue = '';
         this.css = '';

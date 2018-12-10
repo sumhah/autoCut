@@ -576,7 +576,7 @@ cssToClip.getTextLayerCSS = function (boundsInfo) {
     if (textString.length === 0)
         return;
 
-    this.addText('text-content: ' + this.currentLayer.textItem.contents + ';', this.browserTags);
+    this.addText('text-content: ' + this.currentLayer.textItem.textContent + ';', this.browserTags);
 
     var cssUnits = DOMunitToCSS[app.preferences.rulerUnits];
     boundsInfo.textOffset = [UnitValue(0, cssUnits), UnitValue(0, cssUnits)];

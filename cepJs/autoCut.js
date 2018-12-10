@@ -1,5 +1,8 @@
+import layerInfoToCSSText from './lib/layerInfoToCSSText'
+
 export default class AutoCut {
     static csInterface = new CSInterface();
+
     static loadList = [
         'lib/es5-shim.jsx',
         'lib/json2.jsx',
@@ -74,12 +77,9 @@ export default class AutoCut {
     }
 
     static layerSelectHandler() {
-        return;
         this.csInterface.evalScript('selectLayerHandler()', (result) => {
-            // console.log(result);
-            // const css = cssParser.parse(result);
-            // console.log(css);
-            // this.cssDom.innerHTML = css;
+            console.log(JSON.parse(result));
+            this.cssDom.innerHTML = layerInfoToCSSText(JSON.parse(result));
         });
     }
 
