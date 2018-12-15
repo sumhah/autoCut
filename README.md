@@ -8,15 +8,19 @@ Photoshop插件，用来自动化生成HTML，CSS代码
 尚未完成，约50%
 
 ### 项目结构
-./cepJs <br>
-Photoshop浏览器环境的代码<br><br>
+```
+./cepJs
+Photoshop浏览器环境的代码
 
-./js <br>
-node.js处理source文件夹里的资源，最终生成html、css文件的代码<br><br>
+./js
+node.js处理source文件夹里的资源，最终生成html、css文件的代码
 
-./jsx <br>
-Photoshop extentscript环境的代码，主要是es3版本的js，可以调用Photoshop底层的功能，采集图层信息，并生成source资源文件夹<br><br>
-./source <br>
-采集后的Photoshop图层信息和图片资源<br><br>
-./dist <br>
-最终生成的业务代码<br>
+./jsx
+Photoshop extentscript环境的代码，主要是es3版本的js，可以调用Photoshop底层的功能，采集图层信息，并生成source资源文件夹
+
+./source
+采集后的Photoshop图层信息和图片资源
+
+./dist
+最终生成的业务代码
+```
