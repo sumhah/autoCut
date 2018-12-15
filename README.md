@@ -5,7 +5,7 @@ Photoshop plugin for automatically generating HTML,CSS code
 Photoshop插件，用来自动化生成HTML，CSS代码
 
 ## 进度
-尚未完成，约50%
+尚未完成，约60%
 
 ### 项目结构
 ```
