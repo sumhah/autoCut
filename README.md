@@ -23,4 +23,7 @@ Photoshop extentscript环境的代码，主要是es3版本的js，可以调用Ph
 
 ./dist
 最终生成的业务代码
+
+./wasteJs
+已废弃的代码，但还有参考的价值
 ```
