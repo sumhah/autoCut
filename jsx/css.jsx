@@ -224,6 +224,7 @@ try {
                 if (shapeGeom[2] === 'ellipse') {
                     this.borderRadius = '50%';
                 } else {
+                    console.log(shapeGeom, Math.round((shapeGeom[0] + shapeGeom[1]) / 2));
                     this.borderRadius = Math.round((shapeGeom[0] + shapeGeom[1]) / 2);
                 }
                 return;

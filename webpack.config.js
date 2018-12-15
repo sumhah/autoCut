@@ -34,7 +34,7 @@ module.exports = {
         historyApiFallback: true,//不跳转
         inline: true//实时刷新
     },
-    watch: true, // boolean
+    watch: false, // boolean
     // 启用观察
     watchOptions: {
         aggregateTimeout: 1000, // in ms
