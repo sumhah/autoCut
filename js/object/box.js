@@ -1,6 +1,4 @@
-/**
- * Created by zj-db0758 on 17/11/28.
- */
+
 require('../setting');
 require('../util/util');
 require('../util/expand');

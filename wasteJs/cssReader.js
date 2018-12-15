@@ -1,6 +1,4 @@
-/**
- * Created by zj-db0758 on 17/12/9.
- */
+
 const css2json = require('css2json');
 
 class CssReader {

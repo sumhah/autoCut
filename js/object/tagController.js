@@ -1,6 +1,4 @@
-/**
- * Created by zj-db0758 on 17/3/29.
- */
+
 require('../setting');
 require('../util/expand');
 const Tag = require('./tag');

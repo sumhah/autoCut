@@ -1,6 +1,3 @@
-/**
- * Created by zj-db0758 on 17/3/22.
- */
 
 class ColorProcessor {
     constructor(imageDataArr, width, height, className) {

@@ -1,6 +1,4 @@
-/**
- * Created by zj-db0758 on 17/3/20.
- */
+
 require('../setting');
 
 Object.prototype.extend = function (obj) {

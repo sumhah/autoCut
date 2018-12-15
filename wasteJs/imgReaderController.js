@@ -1,6 +1,4 @@
-/**
- * Created by zj-db0758 on 17/11/29.
- */
+
 const ImgReader = require('./imgReader');
 const Manager = require('../manager');
 require('../util/arrayExpand');

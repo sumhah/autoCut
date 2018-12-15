@@ -1,6 +1,3 @@
-/**
- * Created by zj-db0758 on 17/12/16.
- */
 
 global.echoUnit = value => `${value}px`;
 

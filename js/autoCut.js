@@ -1,6 +1,4 @@
-/**
- * Created by zj-db0758 on 17/12/16.
- */
+
 require('./setting');
 require('colors');
 const File = require('./object/easyFile');
